@@ -70,15 +70,12 @@ export const AxiosLoginUser = (user: UserInterface, router) => async (
 
   try {
     const data = await axiosSender(user, "auth/signin");
-    console.log(data);
     setAuthHeader(data.token);
     await dispatch(getUserData());
     dispatch(clearAllErrors());
 
     router.push("/");
   } catch (err) {
-    console.log(err.response.data);
-    console.log(err.response.data.errors);
     err.response.errors
       ? dispatch(
           setErrors({
@@ -157,6 +154,5 @@ export const getUserData = (token?) => async (dispatch: Dispatch<any>) => {
     setAuthHeader(token.split("Bearer ")[1]);
   }
   const user = await axiosFetcher("user/user-credentials");
-  console.log(user);
   dispatch(setUserData(user.data));
 };

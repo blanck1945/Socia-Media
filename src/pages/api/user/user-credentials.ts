@@ -45,5 +45,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       break;
+      default:
+        res.status(500).json({
+          msg: "Error con el servidor"
+        })
   }
 };

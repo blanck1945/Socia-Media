@@ -39,7 +39,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const token = nanoid();
       const timeStamp = dayjs().format("DD-MM-YYYY");
 
-      fs.mkdir(`./public/uploads/${timeStamp}`, { recursive: true }, (err) => {
+      fs.mkdir(`./public/images/${timeStamp}`, { recursive: true }, (err) => {
         if (err) {
           res.status(400).json({
             msg: "no hay directorio",
@@ -61,7 +61,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           form.on("fileBegin", async function (name, file) {
             file.name = token + "-" + file.name;
             file.path = path.join(
-              `./public/uploads/${timeStamp}`,
+              `./public/images/${timeStamp}`,
               slugify(file.name)
             );
 

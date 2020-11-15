@@ -58,7 +58,6 @@ const Say = ({ say }: SayProps) => {
     userLikeSayings();
   };
 
-  console.log(UserState.authenticateUser);
   const likeBtn = !UserState.authenticateUser ? (
     <CustomBtn tip="Like">
       <LinkComp url="/signIn">
