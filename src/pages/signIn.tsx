@@ -55,8 +55,6 @@ const signin = () => {
     dispatch(AxiosLoginUser(user, router));
   };
 
-  console.log(Uistate.loading);
-
   return (
     <div className={form}>
       <Auth url={router.pathname} />
