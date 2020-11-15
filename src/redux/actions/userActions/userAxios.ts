@@ -1,6 +1,7 @@
 import Axios from "axios";
 import { Dispatch } from "react";
 import { axiosFetcher, axiosSender } from "../../../api/fetcher";
+import { setLoadingData } from "../dataActions/dataActions";
 import { axiosGetSayings } from "../dataActions/dataAxios";
 import { clearAllErrors, setErrors, setLoading } from "../uiActions/uiActions";
 import { setLoadingUser, setUnauthenticated, setUserData } from "./userActions";
@@ -121,6 +122,8 @@ export const uploadImage = (formData: any) => async (dispatch) => {
     dispatch(getUserData());
   } catch (err) {
     console.log(err);
+    console.log(err.response)
+    dispatch(setLoadingData())
   }
 };
 

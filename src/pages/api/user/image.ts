@@ -41,7 +41,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       fs.mkdir(`./public/images/${timeStamp}`, { recursive: true }, (err) => {
         if (err) {
-          res.status(400).json({
+          return res.status(400).json({
             msg: "no hay directorio",
             err: err,
           });
