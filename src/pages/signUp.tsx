@@ -58,7 +58,7 @@ const signup = () => {
       )}
       <div>
         <Image
-          src="/../public/icons8-son-goku-64.png"
+          src="/images/icons8-son-goku-64.png"
           alt="image-icon"
           width={125}
           className="pt-2"

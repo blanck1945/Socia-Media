@@ -39,7 +39,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const token = nanoid();
       const timeStamp = dayjs().format("DD-MM-YYYY");
 
-      fs.mkdir(`./public/images/${timeStamp}`, { recursive: true }, (err) => {
+      fs.mkdir(`/images/${timeStamp}`, { recursive: true }, (err) => {
         if (err) {
           return res.status(400).json({
             msg: "no hay directorio",
@@ -53,7 +53,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       const form = new formidable({
         multiple: true,
-        uploadDir: `./public/uploads/${timeStamp}`,
+        uploadDir: `/uploads/${timeStamp}`,
       });
       form.keepExtensions = true;
       form.keepFileName = true;

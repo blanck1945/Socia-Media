@@ -59,7 +59,7 @@ const Auth = ({ url }: AuthProps) => {
   } else {
     return (
       <div className="abs-screen">
-        <img src="/icons8-son-goku-64.png" alt="gokuIcon" />
+        <img src="/images/icons8-son-goku-64.png" alt="gokuIcon" />
         <h4>Reedirigiendo</h4>
       </div>
     );
