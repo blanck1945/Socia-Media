@@ -1,5 +1,9 @@
 import { createStore, combineReducers, applyMiddleware, compose } from "redux";
 
+//Middlewares
+import thunk from "redux-thunk";
+import logger from "redux-logger";
+
 //reducers
 import UiReducer, { UiInitialState } from "./reducers/uiReducers";
 import UserReducer, { UserInitialState } from "./reducers/userReducer";
@@ -11,20 +15,16 @@ export interface GlobalState {
   data: DataInitialState;
 }
 
-//Middlewares
-import thunk from "redux-thunk";
-import logger from "redux-logger";
+// declare global {
+//   interface Window {
+//     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
+//   }
+// }
 
-declare global {
-  interface Window {
-    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
-  }
-}
-
-const composeEnhancers =
-  typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
-    : compose;
+// const composeEnhancers =
+//   typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+//     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+//     : compose;
 
 const initialState = {};
 
@@ -36,5 +36,8 @@ const rootReducers = combineReducers({
   data: DataReducer,
 });
 
-const enhancer = composeEnhancers(applyMiddleware(...middlewares));
-export const store = createStore(rootReducers, initialState, enhancer);
+//const enhancer = composeEnhancers(applyMiddleware(...middlewares));
+export const store =
+  process.env.NODE_ENV === "development"
+    ? createStore(rootReducers, initialState, null)
+    : createStore(rootReducers, initialState, applyMiddleware(thunk));
