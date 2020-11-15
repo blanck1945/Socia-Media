@@ -38,16 +38,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "POST":
       const token = nanoid();
       const timeStamp = dayjs().format("DD-MM-YYYY");
-      console.log(timeStamp);
 
-      fs.mkdir(`./images/${timeStamp}`, { recursive: true }, (err) => {
-        if (err) {
-          return res.status(400).json({
-            msg: "no hay directorio",
-            err: err,
-          });
-        }
-      });
+      // fs.mkdir(`./images/${timeStamp}`, { recursive: true }, (err) => {
+      //   if (err) {
+      //     return res.status(400).json({
+      //       msg: "no hay directorio",
+      //       err: err,
+      //     });
+      //   }
+      // });
 
       const FBuser = await db.doc(`/users/${user.user}`).get();
       const image = FBuser.data().imageUrl;
