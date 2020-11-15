@@ -45,16 +45,19 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           ? "./public/uploads/"
           : "./uploads/";
 
-      // const pathExist = fs.existsSync(`/public/uploads/${timeStamp}`);
-      fs.mkdir(basePath + timeStamp, { recursive: true }, (err) => {
-        if (err) {
-          return res.status(404).json({
-            msg: "error creado el directorio",
-          });
-        } else {
-          console.log("directorio creado");
-        }
-      });
+      const pathExist = fs.existsSync(basePath + timeStamp);
+      if (!pathExist) {
+        fs.mkdir(basePath + timeStamp, { recursive: true }, (err) => {
+          console.log(basePath + timeStamp)
+          if (err) {
+            return res.status(404).json({
+              msg: "error creado el directorio",
+            });
+          } else {
+            console.log("directorio creado");
+          }
+        });
+      }
 
       const FBuser = await db.doc(`/users/${user.user}`).get();
       const image = "./public/" + FBuser.data().imageUrl;
