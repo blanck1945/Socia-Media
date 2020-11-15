@@ -43,12 +43,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const made = mkdirp.sync(`images/${timeStamp}`);
       console.log(`made directories, starting with ${made}`);
 
+      const dir = fs.mkdirSync(`images/${timeStamp}`)
+
       const FBuser = await db.doc(`/users/${user.user}`).get();
       const image = FBuser.data().imageUrl;
 
       const form = new formidable({
         multiple: true,
-        uploadDir: made,
+        uploadDir: dir,
       });
       form.keepExtensions = true;
       form.keepFileName = true;
