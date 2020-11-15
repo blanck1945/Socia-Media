@@ -1,0 +1,10 @@
+@import "./globals.scss";
+
+//importando Bulma
+@import "../node_modules/bulma/bulma.sass";
+
+//importando scss classes
+@import "./classes/clasess.scss";
+
+//Importando Helpers
+@import "./Helpers/helpers.scss";

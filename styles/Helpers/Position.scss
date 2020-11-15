@@ -1,0 +1,43 @@
+.is-flex {
+  display: flex;
+}
+
+.is-align-start {
+  align-items: flex-start;
+}
+
+.is-align-end {
+  align-items: flex-end;
+}
+
+.is-align-center {
+  align-items: center;
+}
+
+.is-justify-center {
+  justify-content: center;
+}
+
+.is-justify-evenly {
+  justify-content: space-evenly;
+}
+
+.is-justify-between {
+  justify-content: space-between;
+}
+
+.is-justify-end {
+  justify-content: flex-end;
+}
+
+.is-dis-col {
+  flex-direction: column;
+}
+
+.is-dis-row {
+  flex-direction: row;
+}
+
+.is-abs {
+  position: absolute;
+}
