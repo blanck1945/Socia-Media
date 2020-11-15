@@ -30,7 +30,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         .collection("users")
         .where("userId", "==", user.uid)
         .get();
-      res.status(200).json({
+      return res.status(200).json({
         msg: "usuario",
         data: data.docs[0].data(),
       });
@@ -43,6 +43,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         if (err) {
           res.status(400).json({
             msg: "no hay directorio",
+            err: err,
           });
         }
       });
@@ -65,7 +66,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
               slugify(file.name)
             );
 
-            const imageUrl = `/uploads/${timeStamp}/${slugify(file.name)}`;
+            const imageUrl = `/images/${timeStamp}/${slugify(file.name)}`;
             await db.doc(`/users/${user.user}`).update({ imageUrl });
 
             const userSayings = await db
@@ -82,7 +83,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
           form.parse(req, (err, fields, file) => {
             if (err) {
-              res.status(404).json({
+              return res.status(404).json({
                 msg: "No se pudo cargar la imagén",
               });
             }
@@ -117,18 +118,19 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
           form.parse(req, (err, fields, file) => {
             if (err) {
-              res.status(404).json({
+              return res.status(404).json({
                 msg: "No se pudo cargar la imagén",
               });
             }
           });
 
-          res.status(200).json({
+          return res.status(200).json({
             msg: "imagén cargada con exito",
           });
         } catch (err) {
-          res.status(404).json({
+          return res.status(404).json({
             msg: "No se pudo cargar la foto",
+            err: err,
           });
         }
       }

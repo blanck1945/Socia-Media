@@ -41,7 +41,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           user: req.body.user,
           email: req.body.email,
           userId: newUser.user.uid,
-          imageUrl: `https://firebasestorage.googleapis.com/v0/b/${process.env.STORAGE_BUCKET}/o/${noImg}?alt=media`,
+          imageUrl: `/images/noImg.png`,
           createdAt: new Date().toISOString(),
         };
 

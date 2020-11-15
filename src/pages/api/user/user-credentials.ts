@@ -38,16 +38,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           });
         }
       } catch (err) {
-        res.status(404).json({
+        return res.status(404).json({
           msg: "Algo falló al intentar obtener la información",
           error: err.code,
         });
       }
 
       break;
-      default:
-        res.status(500).json({
-          msg: "Error con el servidor"
-        })
+    default:
+      return res.status(500).json({
+        msg: "Error con el servidor",
+      });
   }
 };
