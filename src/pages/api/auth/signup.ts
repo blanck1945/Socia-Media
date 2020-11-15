@@ -41,7 +41,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           user: req.body.user,
           email: req.body.email,
           userId: newUser.user.uid,
-          imageUrl: `/images/noImg.png`,
+          imageUrl: `/images/no-user-photo.png`,
           createdAt: new Date().toISOString(),
         };
 

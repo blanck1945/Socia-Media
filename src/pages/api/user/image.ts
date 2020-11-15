@@ -40,17 +40,22 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const token = nanoid();
       const timeStamp = dayjs().format("DD-MM-YYYY");
 
-      const made = mkdirp.sync(`images/${timeStamp}`);
-      console.log(`made directories, starting with ${made}`);
-
-      const dir = fs.mkdirSync(`images/${timeStamp}`)
+      // const pathExist = fs.existsSync(`/public/uploads/${timeStamp}`);
+      fs.mkdir(`./public/uploads/${timeStamp}`, { recursive: true }, (err) => {
+        if (err) {
+          return res.status(404).json({
+            msg: "error creado el directorio",
+          });
+        } else {
+          console.log("directorio creado");
+        }
+      });
 
       const FBuser = await db.doc(`/users/${user.user}`).get();
       const image = FBuser.data().imageUrl;
-
       const form = new formidable({
         multiple: true,
-        uploadDir: dir,
+        uploadDir: `./public/uploads/${timeStamp}`,
       });
       form.keepExtensions = true;
       form.keepFileName = true;
@@ -58,11 +63,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         try {
           form.on("fileBegin", async function (name, file) {
             file.name = token + "-" + file.name;
-            file.path = path.join(`/images/${timeStamp}`, slugify(file.name));
+            file.path = path.join(
+              `./public/uploads/${timeStamp}/`,
+              slugify(file.name)
+            );
+            fs.writeFile(file.path, "new pic", (err) => {
+              if (err) {
+                console.log(err);
+              }
+            });
 
-            const imageUrl = `/images/${timeStamp}/${slugify(file.name)}`;
-            await db.doc(`/users/${user.user}`).update({ imageUrl });
-
+            const imagePath = `/uploads/${timeStamp}/${slugify(file.name)}`;
+            await db
+              .doc(`/uploads/${user.user}`)
+              .update({ imageUrl: imagePath });
             const userSayings = await db
               .collection("sayings")
               .where("user", "==", user.user)
@@ -70,7 +84,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
             userSayings.forEach((doc) => {
               doc.ref.update({
-                userImage: imageUrl,
+                userImage: imagePath,
               });
             });
           });
@@ -83,6 +97,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             }
           });
 
+          console.log("mark 2 - removing old pic");
           fs.unlink(image, (err) => {
             if (err) {
               console.log(err);
@@ -100,14 +115,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       } else {
         try {
           form.on("fileBegin", async function (name, file) {
+            console.log("we reach here");
             file.name = token + "-" + file.name;
             file.path = path.join(
-              `./public/uploads/${timeStamp}`,
+              `./public/uploads/${timeStamp}/`,
               slugify(file.name)
             );
+            fs.writeFile(file.path, "new pic", (err) => {
+              if (err) {
+                console.log(err);
+              }
+            });
+            const imagePath = `/uploads/${timeStamp}/${slugify(file.name)}`;
 
-            const imageUrl = `/uploads/${timeStamp}/${slugify(file.name)}`;
-            await db.doc(`/users/${user.user}`).update({ imageUrl });
+            await db.doc(`/users/${user.user}`).update({ imageUrl: imagePath });
           });
 
           form.parse(req, (err, fields, file) => {
@@ -117,7 +138,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
               });
             }
           });
-
+          console.log("sending res");
           return res.status(200).json({
             msg: "imagén cargada con exito",
           });
@@ -131,7 +152,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       break;
     default:
-      res.status(500).json({
+      return res.status(500).json({
         msg: "ERROR de servidor",
       });
   }

@@ -14,19 +14,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "POST":
       delete req.body.openDetails;
       const validation = validateRequest(res, req.body);
-      console.log(validation);
 
       try {
         await db.doc(`/users/${user.user}`).update(req.body);
-
         return res.status(200).json({
           msg: "Usuario actualizado con exito",
         });
       } catch (err) {
-        res.status(404).json({
+        return res.status(404).json({
           msg: "No se pudo actualizar el usuario",
         });
       }
       break;
+    default:
+      return res.status(500).json({
+        msg: "Error de servidor",
+      });
   }
 };

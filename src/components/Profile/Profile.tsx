@@ -31,7 +31,7 @@ const Profile = () => {
   const selectAndUploadImage = async (e: any) => {
     const image = e.target.files[0];
     const formData = new FormData();
-    formData.append("image", image, image.name);
+    formData.append("image", e.target.files[0]);
     dispatch(uploadImage(formData));
   };
 
@@ -74,25 +74,29 @@ const Profile = () => {
           </div>
           {bio && <span className="mb-2 is-w-80 text-center">{bio}</span>}
           {location && (
-            <div className="is-flex  is-w-50 my-2">
+            <div className="is-flex  is-w-75 my-2 ">
               <LocationOn color="primary" className="ml-4" />
               <span className="ml-4 mt-1">{location}</span>
             </div>
           )}
           {website && (
-            <div className="is-flex  is-w-50 my-2">
+            <div
+              style={{ overflow: "hidden" }}
+              className="is-flex is-w-75 my-2 "
+            >
               <LinkIcon color="primary" className="ml-4 mt-0-5" />
               <a className="ml-4" href={website} target="_blank">
                 {website}
               </a>
             </div>
           )}
-          <div className="is-flex  is-w-50 my-2">
-            <CalendarToday color="primary" className="ml-4 mt-0-5" />
-            <a />
-            <span className="ml-4">Joined {joinDay}</span>
+          <div className="is-flex  is-w-75 is-align-center is-justify-between my-2">
+            <div className="is-flex is-align-center">
+              <CalendarToday color="primary" className="ml-4" />
+              <span className="ml-4">Joined {joinDay}</span>
+            </div>
+            <EditDetails />
           </div>
-          <EditDetails />
         </div>
       </Paper>
     ) : (

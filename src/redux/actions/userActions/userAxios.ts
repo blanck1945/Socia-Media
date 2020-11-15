@@ -122,8 +122,8 @@ export const uploadImage = (formData: any) => async (dispatch) => {
     dispatch(getUserData());
   } catch (err) {
     console.log(err);
-    console.log(err.response)
-    dispatch(setLoadingData())
+    console.log(err.response);
+    dispatch(setLoadingData());
   }
 };
 
@@ -139,6 +139,7 @@ export const axiosEditUserDetails = (userDetails: any) => async (
   dispatch(setLoadingUser());
   try {
     await axiosSender(userDetails, "user/update-user");
+  console.log("data has been updated")
     dispatch(getUserData());
   } catch (err) {
     console.log(err);
