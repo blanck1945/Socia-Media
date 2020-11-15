@@ -3,7 +3,7 @@ import Axios from "axios";
 export const baseURL =
   process.env.NODE_ENV === "development"
     ? "http://localhost:3000/api/"
-    : "vercelURL";
+    : "https://socia-media.vercel.app/api/";
 
 export const axiosSender = async (reqData: any, url?: string) => {
   const { data } = await Axios({
