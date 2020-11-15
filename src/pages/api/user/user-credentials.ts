@@ -17,7 +17,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         credentials: {},
       };
       const doc = await db.doc(`/users/${user.user}`).get();
-
+      console.log(doc);
       try {
         if (doc.exists) {
           userData.credentials = { ...doc.data() };

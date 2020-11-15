@@ -40,9 +40,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const timeStamp = dayjs().format("DD-MM-YYYY");
       console.log(timeStamp);
 
-      fs.mkdir(`/images/${token}`, { recursive: true }, (err) => {
+      fs.mkdir(`/images/${timeStamp}`, (err) => {
         if (err) {
-          console.log(err)
           return res.status(400).json({
             msg: "no hay directorio",
             err: err,
