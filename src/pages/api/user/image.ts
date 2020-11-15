@@ -52,16 +52,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       });
 
       const FBuser = await db.doc(`/users/${user.user}`).get();
-      const image = FBuser.data().imageUrl;
+      const image = "./public/" + FBuser.data().imageUrl;
       const form = new formidable({
         multiple: true,
         uploadDir: `./public/uploads/${timeStamp}`,
       });
       form.keepExtensions = true;
       form.keepFileName = true;
+      console.log(image);
       if (fs.existsSync(image)) {
         try {
-          form.on("fileBegin", async function (name, file) {
+          await form.on("fileBegin", async function (name, file) {
             file.name = token + "-" + file.name;
             file.path = path.join(
               `./public/uploads/${timeStamp}/`,
@@ -72,11 +73,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 console.log(err);
               }
             });
+            console.log("creatig new pic");
 
             const imagePath = `/uploads/${timeStamp}/${slugify(file.name)}`;
-            await db
-              .doc(`/uploads/${user.user}`)
-              .update({ imageUrl: imagePath });
+            await db.doc(`/users/${user.user}`).update({ imageUrl: imagePath });
             const userSayings = await db
               .collection("sayings")
               .where("user", "==", user.user)
@@ -97,7 +97,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             }
           });
 
-          console.log("mark 2 - removing old pic");
           fs.unlink(image, (err) => {
             if (err) {
               console.log(err);
