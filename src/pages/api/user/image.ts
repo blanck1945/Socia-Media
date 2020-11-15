@@ -40,7 +40,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const timeStamp = dayjs().format("DD-MM-YYYY");
       console.log(timeStamp);
 
-      fs.mkdir(`/images/${timeStamp}`, (err) => {
+      fs.mkdir(`./images/${timeStamp}`, (err) => {
         if (err) {
           return res.status(400).json({
             msg: "no hay directorio",
@@ -50,11 +50,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       });
 
       const FBuser = await db.doc(`/users/${user.user}`).get();
-      const image = "./public" + FBuser.data().imageUrl;
+      const image = FBuser.data().imageUrl;
 
       const form = new formidable({
         multiple: true,
-        uploadDir: `/uploads/${token}`,
+        uploadDir: `./images/${token}`,
       });
       form.keepExtensions = true;
       form.keepFileName = true;
@@ -62,10 +62,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         try {
           form.on("fileBegin", async function (name, file) {
             file.name = token + "-" + file.name;
-            file.path = path.join(
-              `./public/images/${timeStamp}`,
-              slugify(file.name)
-            );
+            file.path = path.join(`/images/${timeStamp}`, slugify(file.name));
 
             const imageUrl = `/images/${timeStamp}/${slugify(file.name)}`;
             await db.doc(`/users/${user.user}`).update({ imageUrl });

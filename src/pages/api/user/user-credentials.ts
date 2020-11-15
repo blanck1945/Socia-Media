@@ -4,7 +4,6 @@ import { firebaseClient } from "../../../../firebase/firebaseClient";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const user = await firebaseAuthUser(req, res);
-  console.log(user);
   const firebase = await firebaseClient();
   const db = firebase.firestore();
 
