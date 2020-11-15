@@ -13,7 +13,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   switch (method) {
     case "POST":
       delete req.body.openDetails;
-      const validation = validateRequest(res, req.body);
+      //const validation = validateRequest(res, req.body);
 
       try {
         await db.doc(`/users/${user.user}`).update(req.body);

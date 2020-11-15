@@ -40,8 +40,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const token = nanoid();
       const timeStamp = dayjs().format("DD-MM-YYYY");
 
+      const basePath =
+        process.env.NODE_ENV === "development"
+          ? "./public/uploads/"
+          : "./uploads/";
+
       // const pathExist = fs.existsSync(`/public/uploads/${timeStamp}`);
-      fs.mkdir(`./public/uploads/${timeStamp}`, { recursive: true }, (err) => {
+      fs.mkdir(basePath + timeStamp, { recursive: true }, (err) => {
         if (err) {
           return res.status(404).json({
             msg: "error creado el directorio",
@@ -55,18 +60,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const image = "./public/" + FBuser.data().imageUrl;
       const form = new formidable({
         multiple: true,
-        uploadDir: `./public/uploads/${timeStamp}`,
+        uploadDir: basePath + timeStamp,
       });
       form.keepExtensions = true;
       form.keepFileName = true;
-      console.log(image);
       if (fs.existsSync(image)) {
         try {
           await form.on("fileBegin", async function (name, file) {
             file.name = token + "-" + file.name;
             file.path = path.join(
-              `./public/uploads/${timeStamp}/`,
-              slugify(file.name)
+              basePath + timeStamp + "/" + slugify(file.name)
             );
             fs.writeFile(file.path, "new pic", (err) => {
               if (err) {
@@ -75,7 +78,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             });
             console.log("creatig new pic");
 
-            const imagePath = `/uploads/${timeStamp}/${slugify(file.name)}`;
+            const imagePath = basePath + timeStamp + "/" + slugify(file.name);
             await db.doc(`/users/${user.user}`).update({ imageUrl: imagePath });
             const userSayings = await db
               .collection("sayings")
