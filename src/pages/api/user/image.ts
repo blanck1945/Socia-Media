@@ -5,6 +5,7 @@ import { firebaseAuthUser } from "../../../utils/authenticateUser";
 import { firebaseClient } from "../../../../firebase/firebaseClient";
 import { nanoid } from "nanoid";
 import slugify from "slugify";
+import mkdirp from "mkdirp";
 import dayjs from "dayjs";
 
 import formidable from "formidable-serverless";
@@ -39,14 +40,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const token = nanoid();
       const timeStamp = dayjs().format("DD-MM-YYYY");
 
-      fs.mkdirSync(`./images/${timeStamp}`, { recursive: true });
+      const made = mkdirp.sync(`images/${timeStamp}`);
+      console.log(`made directories, starting with ${made}`);
 
       const FBuser = await db.doc(`/users/${user.user}`).get();
       const image = FBuser.data().imageUrl;
 
       const form = new formidable({
         multiple: true,
-        uploadDir: `./images/${token}`,
+        uploadDir: made,
       });
       form.keepExtensions = true;
       form.keepFileName = true;

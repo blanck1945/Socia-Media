@@ -20,6 +20,7 @@
     "firebase-functions": "^3.11.0",
     "formidable-serverless": "^1.0.3",
     "jwt-decode": "^3.1.1",
+    "mkdirp": "^1.0.4",
     "nanoid": "^3.1.16",
     "next": "10.0.1",
     "node-sass": "4.14",
