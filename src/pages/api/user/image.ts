@@ -1,16 +1,125 @@
-require("dotenv").config();
+import env from "dotenv";
 import "firebase/storage";
+import mongo from "mongodb";
+import dbConnect from "../../../../mongo/mongo.db";
 import { NextApiRequest, NextApiResponse } from "next";
 import { firebaseAuthUser } from "../../../utils/authenticateUser";
-import { firebaseClient } from "../../../../firebase/firebaseClient";
+import { firebaseClient, bucket } from "../../../../firebase/firebaseClient";
+import Usuario from "../../../models/User";
+var Binary = require("mongodb").Binary;
+import multiparty from "multiparty";
+import http from "http";
+import util from "util";
+
 import { nanoid } from "nanoid";
 import slugify from "slugify";
-import mkdirp from "mkdirp";
+import { firebaseAdmin } from "../../../../firebase/firebaseAdmin";
 import dayjs from "dayjs";
 
-import formidable from "formidable-serverless";
+//import formidable from "formidable-serverless";
 import path from "path";
 import fs from "fs";
+import os from "os";
+
+env.config();
+
+/*export const config = {
+  api: {
+    bodyParser: false,
+  },
+};*/
+
+import formidable from "formidable";
+import Models from "../../../models/Models";
+
+export default async (req, res) => {
+  const user = await firebaseAuthUser(req, res);
+  await dbConnect();
+
+  const { method } = req;
+
+  switch (method) {
+    case "POST":
+      const mongoUser = await Models.Usuario.findOne({
+        name: user.user,
+      });
+
+      const data: any = await new Promise((resolve, reject) => {
+        const form = new formidable.IncomingForm({
+          multiples: true,
+          keepExtensions: true,
+        });
+
+        form.parse(req, (err, fields, files) => {
+          if (err) reject(err);
+          resolve({ fields, files });
+        });
+      });
+      const image = fs.readFileSync(data.files.avatar.path);
+      const buf = Buffer.from(data.files.avatar.path);
+
+      mongoUser.avatar = image.toString("base64");
+      mongoUser.type = data.files.avatar.type;
+      try {
+        await mongoUser.save();
+        return res.status(200).json({
+          data: mongoUser,
+          msg: "Data send",
+        });
+      } catch (err) {
+        return res.status(404).json({
+          msg: "error",
+          err: err,
+        });
+      }
+
+      /*const img = data.files.image;
+      console.log(Buffer.from(data.files.image.path, "base64"));
+
+      mongoUser.avatar = Buffer.from(data.files.image.path, "base64");
+      mongoUser.type = img.type;
+      console.log("mongoUser update");*/
+      /*var file = fs.readFileSync(data.files.image.path);
+      var insert_data: any = {};
+      insert_data.file_data = Binary(file);*/
+
+      //onsole.log(data.files.image);
+      //const encImg = data.files.image.path.toString("base64");
+
+      break;
+    default:
+      return res.status(500).json({
+        msg: "error de servidor",
+      });
+
+    /*return promise.then(({ fields, files }) => {
+      });*/
+  }
+};
+
+/*  form.once("error", console.error);
+        form.on("fileBegin", (name, file) => {
+          console.log("start uploading: ", file.name);
+          const timeStamp = dayjs().format("DD-MM-YYYY");
+
+          if (fs.existsSync(`public/uploads/${timeStamp}/`)) {
+            const data = fs.readFileSync(os.tmpdir + file.name);
+            fs.writeFileSync(
+              `public/upload/${timeStamp}/social-${file.name}`,
+              data
+            );
+          } else {
+            fs.mkdir(
+              `public/uploads/${timeStamp}`,
+              { recursive: true },
+              (err) => {
+                if (err) {
+                  return err;
+                }
+              }
+            );
+          }
+        });*/
 
 export const config = {
   api: {
@@ -18,10 +127,21 @@ export const config = {
   },
 };
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const user = await firebaseAuthUser(req, res);
+/*
+const data: any = await new Promise((resolve, reject) => {
+  const form = new formidable.IncomingForm();
+
+  form.parse(req, (err, fields, files) => {
+    if (err) reject(err);
+    resolve({ fields, files });
+  });
+});*/
+
+/*export default async (req: NextApiRequest, res: NextApiResponse) => {
+  //const user = await firebaseAuthUser(req, res);
   const firebase = firebaseClient();
   const db = firebase.firestore();
+  //const mongoDb = await mongoConnect();
 
   const { method } = req;
 
@@ -29,14 +149,91 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "GET":
       const data = await db
         .collection("users")
-        .where("userId", "==", user.uid)
+        .where("userId", "==", "moeppi")
         .get();
       return res.status(200).json({
         msg: "usuario",
         data: data.docs[0].data(),
       });
-      break;
     case "POST":
+      const form = new formidable({
+        multiple: true,
+      });
+      form.keepExtensions = true;
+      form.keepFileName = true;
+      console.log("using this route");
+
+      form.on("fileBegin", async function (name, file) {
+        console.log(file.name);
+
+        return res.status(404).json({
+          msg: "returning data",
+        });
+      });
+
+      return;
+
+      const { name, email, image } = req.body;
+
+      const newUser = new Usuario({
+        name: req.body.name,
+        email: req.body.email,
+      });
+
+      console.log(newUser);
+
+      saveImage(newUser, req.body.image);
+
+      try {
+        await newUser.save();
+
+        return res.status(200).json({
+          msg: "user created",
+          data: newUser,
+        });
+      } catch (err) {
+        res.status(404).json({
+          msg: "Something went wrong saving the photo",
+        });
+      }
+      break;
+
+    default:
+      return res.status(500).json({
+        msg: "ERROR de servidor",
+      });
+  }
+};*/
+
+/*
+const saveImage = (user, imgEncoded) => {
+  const imageTypes = ["image/jpeg", "image/png", "image/gif"];
+  if (imgEncoded === null) return;
+
+  console.log(imgEncoded);
+
+  const img = imgEncoded;
+
+  if (img !== null && imageTypes.includes(img.type)) {
+    user.image = Buffer.from(img.data, "base64");
+    user.imageType = img.type;
+  }
+};*/
+
+/*
+ file.path = path.join(
+              basePath + timeStamp + "/" + slugify(file.name)
+            );
+            fs.writeFile(file.path, "new pic", (err) => {
+              if (err) {
+                console.log(err);
+              }
+            });
+
+            const imagePath = basePath + timeStamp + "/" + slugify(file.name);*/
+
+/*
+            case "POST":
       const token = nanoid();
       const timeStamp = dayjs().format("DD-MM-YYYY");
 
@@ -48,7 +245,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const pathExist = fs.existsSync(basePath + timeStamp);
       if (!pathExist) {
         fs.mkdir(basePath + timeStamp, { recursive: true }, (err) => {
-          console.log(basePath + timeStamp)
+          console.log(basePath + timeStamp);
           if (err) {
             return res.status(404).json({
               msg: "error creado el directorio",
@@ -67,22 +264,32 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       });
       form.keepExtensions = true;
       form.keepFileName = true;
-      if (fs.existsSync(image)) {
+      const exi = true;
+      if (exi) {
         try {
           await form.on("fileBegin", async function (name, file) {
             file.name = token + "-" + file.name;
-            file.path = path.join(
-              basePath + timeStamp + "/" + slugify(file.name)
-            );
-            fs.writeFile(file.path, "new pic", (err) => {
-              if (err) {
-                console.log(err);
-              }
-            });
-            console.log("creatig new pic");
+            file.path = path.join(os.tmpdir(), file.name);
+            console.log(file.path);
 
-            const imagePath = basePath + timeStamp + "/" + slugify(file.name);
-            await db.doc(`/users/${user.user}`).update({ imageUrl: imagePath });
+            console.log("Declare path and uploading new pic");
+
+            await firebaseAdmin
+              .storage()
+              .bucket(bucket)
+              .upload(file.path, {
+                resumable: false,
+                metadata: {
+                  metadata: {
+                    contentType: file.type,
+                    //Generate token to be appended to imageUrl
+                  },
+                },
+              });
+
+            const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${file.name}?alt=media`;
+
+            await db.doc(`/users/${user.user}`).update({ imageUrl });
             const userSayings = await db
               .collection("sayings")
               .where("user", "==", user.user)
@@ -90,7 +297,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
             userSayings.forEach((doc) => {
               doc.ref.update({
-                userImage: imagePath,
+                userImage: imageUrl,
               });
             });
           });
@@ -155,10 +362,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         }
       }
 
-      break;
-    default:
-      return res.status(500).json({
-        msg: "ERROR de servidor",
-      });
-  }
-};
+      break;*/

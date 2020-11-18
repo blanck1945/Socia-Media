@@ -3,6 +3,8 @@ import { firebaseClient } from "../../../../firebase/firebaseClient";
 import { NextApiRequest, NextApiResponse } from "next";
 import { validateRequest } from "../../../validators/signin";
 import { authenticateUser } from "../../../utils/authenticateUser";
+import dbConnect from "../../../../mongo/mongo.db";
+import Models from "../../../models/Models";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const validators = validateRequest(res, req.body);
@@ -12,6 +14,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   dot.config();
   const firebase = await firebaseClient();
+  await dbConnect();
   const db = firebase.firestore();
   const auth = firebase.auth();
 
@@ -29,29 +32,34 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           });
         }
 
-        const noImg = "no-user-photo.png";
-
         const newUser = await auth.createUserWithEmailAndPassword(
           req.body.email,
           req.body.password
         );
+
+        const mongoCredentials = {
+          name: req.body.user,
+          email: req.body.email,
+        };
+
+        const newMongoUser = await Models.Usuario.create(mongoCredentials);
 
         const token = await newUser.user.getIdToken();
         const userCredentials = {
           user: req.body.user,
           email: req.body.email,
           userId: newUser.user.uid,
-          imageUrl: `/images/no-user-photo.png`,
-          createdAt: new Date().toISOString(),
+          userMongoId: newMongoUser._id.toString(),
         };
 
         await db.doc(`/users/${req.body.user}`).set(userCredentials);
 
         res.status(201).json({
-          msg: `user ${newUser.user.uid} creado con exito`,
+          msg: `user ${newMongoUser._id} creado con exito`,
           token: token,
         });
       } catch (err) {
+        console.log(err);
         res.status(404).json({
           msg: "Error en la creación",
           error: err.code,

@@ -2,9 +2,18 @@ import { SayInterface } from "../actions/dataActions/dataActions";
 import { DataActionTypes } from "../actions/dataActions/dataInterface";
 import * as DataTypes from "../types";
 
+interface CommentInterface {
+  sayingId: string;
+  body: string;
+  createdAt: any;
+  user: string;
+  imageUrl: string;
+}
+
 export interface DataInitialState {
   sayings: [SayInterface];
   singleSay: SayInterface;
+  comments: CommentInterface[];
   loading: boolean;
   sayLength: number;
 }
@@ -12,6 +21,7 @@ export interface DataInitialState {
 const dataInitialState = {
   sayings: undefined,
   singleSay: undefined,
+  comments: undefined,
   loading: false,
   sayLength: 149,
 };
@@ -67,7 +77,16 @@ const DataReducer = (
         ...state,
         sayLength: 149,
       };
-
+    case DataTypes.SET_COMMENTS:
+      return {
+        ...state,
+        comments: action.payload,
+      };
+    case DataTypes.CLEAR_COMMENTS:
+      return {
+        ...state,
+        comments: undefined,
+      };
     default:
       return state;
   }

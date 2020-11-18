@@ -1,11 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { firebaseClient } from "../../../../../firebase/firebaseClient";
+import dbConnect from "../../../../../mongo/mongo.db";
+import Models from "../../../../models/Models";
 import { firebaseAuthUser } from "../../../../utils/authenticateUser";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const user = await firebaseAuthUser(req, res);
   const firebase = await firebaseClient();
   const db = firebase.firestore();
+  await dbConnect();
 
   const { method } = req;
 
@@ -19,6 +22,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       const sayingDoc = await db.doc(`/sayings/${req.query.id}`);
       const sayingGET = await sayingDoc.get();
+      console.log(sayingGET.data().user);
+
+      let mongoImgString;
+
+      await Models.Usuario.findOne(
+        {
+          name: sayingGET.data().user,
+        },
+        (err, mongoUser) => {
+          if (mongoUser) {
+            const mongob64 = Buffer.from(mongoUser.avatar, "base64");
+            mongoImgString = `data:${mongoUser.type};base64,${mongob64}`;
+          }
+        }
+      );
 
       try {
         if ((await sayingGET).exists) {
@@ -39,8 +57,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
               likeCount: sayDATA.likeCount,
             });
 
+            const say = {
+              ...sayDATA,
+              mongoImgString: mongoImgString,
+            };
+
             return res.status(201).json({
-              data: sayDATA,
+              data: say,
               msg: "Dicho likeado",
             });
           } else {

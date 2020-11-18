@@ -33,7 +33,13 @@ const getAuthenticateUser = async (token) => {
     .get();
 
   logUser.user = data.docs[0].data().user;
-  logUser.imageUrl = data.docs[0].data().imageUrl;
+  logUser.imageUrl = data.docs[0].data().imageUrl
+    ? data.docs[0].data().imageUrl
+    : "./public/uploads/images/no-user-photo-png";
+  logUser.userMongoId = data.docs[0].data().userMongoId
+    ? data.docs[0].data().userMongoId
+    : null;
+
   return logUser;
 };
 

@@ -14,7 +14,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "POST":
       const logUser = await authenticateUser(res, req.body);
       if (!logUser) {
-        return logUser;
+        return res.status(404).json({
+          msg: "No user was authenticated",
+        });
       }
       const token = await logUser.user.getIdToken();
       res.status(200).json({

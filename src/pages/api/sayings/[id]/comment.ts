@@ -3,14 +3,31 @@ import { firebaseClient } from "../../../../../firebase/firebaseClient";
 import { firebaseAuthUser } from "../../../../utils/authenticateUser";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const user = await firebaseAuthUser(req, res);
   const firebase = await firebaseClient();
   const db = firebase.firestore();
 
   const { method } = req;
 
   switch (method) {
+    case "GET":
+      let comments = [];
+      console.log(req.query.id);
+      const data = await db
+        .collection("comments")
+        .where("sayingId", "==", req.query.id);
+
+      const dataGET = await data.get();
+      dataGET.docs.forEach((doc) => {
+        comments.push(doc.data());
+      });
+
+      return res.status(200).json({
+        msg: "Comments",
+        comments: comments,
+      });
+
     case "POST":
+      const user = await firebaseAuthUser(req, res);
       if (req.body.body.trim() === "") {
         return res.status(404).json({ comment: "no puede estar vacio" });
       }

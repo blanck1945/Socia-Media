@@ -17,3 +17,5 @@ export const SET_ONE_SAY = "SET_ONE_SAY";
 export const LIKE_SAY = "LIKE_SAY";
 export const UNLIKE_SAY = "UNLIKE_SAY";
 export const COMMENT_SAT = "COMMENT_SAY";
+export const SET_COMMENTS = "SET_COMMENTS";
+export const CLEAR_COMMENTS = "CLEAR_COMMENTS";

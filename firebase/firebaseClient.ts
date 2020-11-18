@@ -11,6 +11,8 @@ const firebaseConfig = {
   measurementId: "G-NDSWR0R22L",
 };
 
+export const bucket = "type-todo.appspot.com";
+
 export const firebaseClient = () => {
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);

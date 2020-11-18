@@ -1,9 +1,23 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { firebaseAuthUser } from "../../../utils/authenticateUser";
 import { firebaseClient } from "../../../../firebase/firebaseClient";
+import Models from "../../../models/Models";
+import dbConnect from "../../../../mongo/mongo.db";
+
+interface MongoUser {
+  _id: string;
+  defaultImg: string;
+  createdAt: string;
+  name: string;
+  email: string;
+  avatar: any;
+  type: string;
+}
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const user = await firebaseAuthUser(req, res);
+  console.log("user decoded");
+  await dbConnect();
   const firebase = await firebaseClient();
   const db = firebase.firestore();
 
@@ -11,14 +25,34 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   switch (method) {
     case "GET":
-      let userData = {
+      interface UserData {
+        likes: Array<any>;
+        credentials: any;
+      }
+      let userData: UserData = {
         likes: [],
-        credentials: {},
+        credentials: undefined,
       };
-      const doc = await db.doc(`/users/${user.user}`).get();
+
       try {
+        const mongoUser: any = await Models.Usuario.findOne({
+          name: user.user,
+        });
+        //const mongob64 = Buffer.from(mongoUser.avatar, "base64");
+        //const mongoImgString = `data:${mongoUser.type};base64,${mongob64}`;
+        mongoUser.mongoImgString;
+
+        const doc: any = await db.doc(`/users/${user.user}`).get();
         if (doc.exists) {
-          userData.credentials = { ...doc.data() };
+          userData.credentials = {
+            ...doc.data(),
+            ...mongoUser.toJSON(),
+          };
+          if (!userData.credentials.imageUrl) {
+            userData.credentials.imageUrl =
+              "./public/uploads/images/no-user-photo-png";
+          }
+
           const likesDoc = await db
             .collection("likes")
             .where("user", "==", user.user)

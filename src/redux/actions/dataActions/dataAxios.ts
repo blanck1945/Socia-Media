@@ -9,6 +9,7 @@ import {
   addSay,
   deleteSay,
   likeSay,
+  setComments,
   setLoadingData,
   setSayings,
   setSingleSay,
@@ -42,6 +43,7 @@ export const axiosLikeSay = (sayId) => async (dispatch) => {
     //const data = await axiosFetcher(`sayings/${sayId}/like`);
 
     const res = await Axios(`api/sayings/${sayId}/like`);
+    console.log(res);
     dispatch(likeSay(res.data.data));
   } catch (err) {
     console.log(err);
@@ -71,6 +73,16 @@ export const axiosPostSay = (say) => async (dispatch) => {
     console.log(resSay);
     dispatch(addSay(resSay.data));
     dispatch(clearAllErrors());
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const axiosGetComments = (sayId) => async (dispatch) => {
+  try {
+    const res = await axiosFetcher(`sayings/${sayId}/comment`);
+    console.log(res);
+    dispatch(setComments(res.comments));
   } catch (err) {
     console.log(err);
   }

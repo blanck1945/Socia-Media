@@ -25,13 +25,21 @@ const Profile = () => {
   const {
     loading,
     authenticateUser,
-    credentials: { user, createdAt, imageUrl, bio, website, location },
+    credentials: {
+      user,
+      createdAt,
+      defaultImg,
+      imageUrl,
+      bio,
+      website,
+      location,
+      mongoImgString,
+    },
   } = useSelector((state) => state.user);
 
   const selectAndUploadImage = async (e: any) => {
-    const image = e.target.files[0];
     const formData = new FormData();
-    formData.append("image", e.target.files[0]);
+    formData.append("avatar", e.target.files[0]);
     dispatch(uploadImage(formData));
   };
 
@@ -48,7 +56,11 @@ const Profile = () => {
       <Paper className="">
         <div className="is-flex is-align-center  is-dis-col">
           <div className="is-flex is-align-center ">
-            <img src={imageUrl} alt="userImage" className="mb-2 is-w-full " />
+            <img
+              src={mongoImgString ? mongoImgString : defaultImg}
+              alt="userImage"
+              className="mb-2 is-w-full "
+            />
             <input
               hidden={true}
               type="file"

@@ -71,6 +71,7 @@ export const AxiosLoginUser = (user: UserInterface, router) => async (
 
   try {
     const data = await axiosSender(user, "auth/signin");
+
     setAuthHeader(data.token);
     await dispatch(getUserData());
     dispatch(clearAllErrors());
@@ -117,12 +118,11 @@ export const AxiosLoginUser = (user: UserInterface, router) => async (
 export const uploadImage = (formData: any) => async (dispatch) => {
   dispatch(setLoadingUser());
   try {
-    await axiosSender(formData, "user/image");
+    const data = await axiosSender(formData, "user/image");
+    console.log(data);
     dispatch(axiosGetSayings());
     dispatch(getUserData());
   } catch (err) {
-    console.log(err);
-    console.log(err.response);
     dispatch(setLoadingData());
   }
 };
@@ -139,7 +139,6 @@ export const axiosEditUserDetails = (userDetails: any) => async (
   dispatch(setLoadingUser());
   try {
     await axiosSender(userDetails, "user/update-user");
-  console.log("data has been updated")
     dispatch(getUserData());
   } catch (err) {
     console.log(err);
@@ -158,5 +157,6 @@ export const getUserData = (token?) => async (dispatch: Dispatch<any>) => {
     setAuthHeader(token.split("Bearer ")[1]);
   }
   const user = await axiosFetcher("user/user-credentials");
+  console.log(user)
   dispatch(setUserData(user.data));
 };

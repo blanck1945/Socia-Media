@@ -31,8 +31,13 @@ export interface POST_SAY_ACTION_TYPE {
   payload: any;
 }
 
+export interface CLEAR_COMMENTS_ACTION_TYPE {
+  type: typeof DataTypes.CLEAR_COMMENTS;
+}
+
 export type DataActionTypes =
   | LIKE_SAY_ACTION_TYPE
   | UNLIKE_SAY_ACTION_TYPE
   | DELETE_SAY_ACTION_TYPE
-  | POST_SAY_ACTION_TYPE;
+  | POST_SAY_ACTION_TYPE
+  | CLEAR_COMMENTS_ACTION_TYPE;

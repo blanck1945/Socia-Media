@@ -21,7 +21,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx", "firebase/db.js"
+    "**/*.tsx", "firebase/db.js", "src/models/UserModel.js", "src/models/models.js"
   ],
   "exclude": [
     "node_modules"

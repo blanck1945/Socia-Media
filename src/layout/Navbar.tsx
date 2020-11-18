@@ -51,6 +51,7 @@ const Navbar = () => {
                 <CustomBtn tip="Notifications">
                   <Notifications className="has-text-white" />
                 </CustomBtn>
+                <LinkComp url="/play">Play</LinkComp>
               </div>
               <button
                 className="b-none is-click has-background-info px-4 pt-2 pb-2 has-text white mx-4 has-text-white has-rad-4 is-click-4 f-size-1-3"

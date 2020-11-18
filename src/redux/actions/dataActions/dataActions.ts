@@ -8,6 +8,7 @@ export interface SayInterface {
   userImage: string;
   likeCount: number;
   commentCount: number;
+  mongoImgString: string;
 }
 
 export const setSayings = (payload: SayInterface[]) => ({
@@ -17,7 +18,7 @@ export const setSayings = (payload: SayInterface[]) => ({
 
 export const setSingleSay = (payload: SayInterface) => ({
   type: DataTypes.SET_ONE_SAY,
-  payload: payload
+  payload: payload,
 });
 
 export const likeSay = (payload) => ({
@@ -42,4 +43,13 @@ export const deleteSay = (sayId: string) => ({
 export const addSay = (say: any) => ({
   type: DataTypes.POST_SAY,
   payload: say,
+});
+
+export const setComments = (comments: any) => ({
+  type: DataTypes.SET_COMMENTS,
+  payload: comments,
+});
+
+export const clearComments = () => ({
+  type: DataTypes.CLEAR_COMMENTS,
 });

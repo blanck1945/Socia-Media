@@ -4,7 +4,7 @@ import {
   firebaseAuthUser,
 } from "../../utils/authenticateUser";
 import { firebaseClient } from "../../../firebase/firebaseClient";
-import { verifyIdToken } from "../../../firebase/firebaseAdmin";
+import Models from "../../models/Models";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const firebase = firebaseClient();
@@ -21,16 +21,46 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         .collection("sayings")
         .orderBy("createdAt", "desc")
         .get();
+
+      const users = await Models.Usuario.find({});
+
       fbData.docs.forEach((doc) => {
         sayings.push({
           sayingId: doc.id,
           ...doc.data(),
         });
       });
-      res.status(200).json({
-        sayings: sayings,
-      });
 
+      const getMongoImg = async (usuario) => {
+        return await Models.Usuario.findOne({
+          name: usuario,
+        })
+          .exec()
+          .then((mongoUser) => {
+            if (!mongoUser) {
+              return "No user in Mongo DB";
+            } else {
+              const mongob64 = Buffer.from(mongoUser.avatar, "base64");
+              const mongoImgString = `data:${mongoUser.type};base64,${mongob64}`;
+              return mongoImgString;
+            }
+          });
+      };
+
+      const makeArr = (sayings) => {
+        return sayings.map(async (el) => {
+          return {
+            ...el,
+            mongoImgString: await getMongoImg(el.user),
+          };
+        });
+      };
+
+      const sayArr = await Promise.all(makeArr(sayings));
+
+      return res.status(200).json({
+        sayings: sayArr,
+      });
       break;
     case "POST":
       const user = await firebaseAuthUser(req, res);

@@ -9,10 +9,11 @@ import { SayInterface } from "../redux/actions/dataActions/dataActions";
 //Mui imports
 import Grid from "@material-ui/core/Grid";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { GlobalState } from "../redux/store";
 
 export default function Home() {
   const dispatch = useDispatch();
-  const DataState = useSelector((state) => state.data);
+  const DataState = useSelector((state: GlobalState) => state.data);
 
   useEffect(() => {
     if (DataState.sayings === undefined) {
@@ -24,7 +25,6 @@ export default function Home() {
 
   return (
     <>
-      <Auth />
       <Grid container spacing={10}>
         <Grid item sm={8} xs={12}>
           {DataState?.loading ? (
@@ -45,3 +45,5 @@ export default function Home() {
     </>
   );
 }
+
+//<Auth />
