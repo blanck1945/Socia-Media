@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 const day = new Date();
 const jsDay = day.getFullYear() + "-" + day.getMonth() + "-" + day.getDate();
+const paginate = require("mongoose-paginate-v2");
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,11 +20,11 @@ const userSchema = new mongoose.Schema(
       opinion: String,
       score: Number,
     },
-    location: String,
-    defaultImg: {
-      type: String,
-      default: `/images/no-user-photo.png`,
+    profile: {
+      type: Boolean,
+      default: true,
     },
+    location: String,
     avatar: Buffer,
     type: String,
     createdAt: {
@@ -37,6 +38,8 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+userSchema.plugin(paginate);
+
 userSchema.virtual("mongoImgString").get(function () {
   if (this.avatar != null) {
     const mongob64 = Buffer.from(this.avatar, "base64");
@@ -46,6 +49,7 @@ userSchema.virtual("mongoImgString").get(function () {
 
 userSchema.statics.getImg = function () {
   const mongob64 = Buffer.from(this.avatar, "base64");
+  console.log("gettinh img");
   return `data:${this.type};base64,${mongob64}`;
 };
 

@@ -1,5 +1,15 @@
 import jwtDecode from "jwt-decode";
 
+export const verifyTokenAge = (token: string) => {
+  const decodedToken: any = jwtDecode(token);
+  const result = decodedToken.exp * 1000 < Date.now();
+  if (result) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
 export const checkToken = (token, router) => {
   if (token) {
     const decodedToken: any = jwtDecode(token);

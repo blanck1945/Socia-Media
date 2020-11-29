@@ -1,3 +1,10 @@
+//Mui imports
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import Alert from "@material-ui/lab/Alert";
+import CircularProgress from "@material-ui/core/CircularProgress";
+
 import Image from "next/image";
 import LinkComp from "../components/LinkComp/LinkComp";
 import { useState } from "react";
@@ -9,30 +16,35 @@ import {
 } from "../redux/actions/userActions/userAxios";
 import { useSelector, useDispatch } from "react-redux";
 import Auth from "./Auth";
-
-//Mui imports
-import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Alert from "@material-ui/lab/Alert";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { clearAllErrors } from "../redux/actions/uiActions/uiActions";
+import { UiInitialState } from "../redux/reducers/uiReducers";
+import { GlobalState } from "../redux/store";
+import { useEffect } from "react";
+import { setCongratzMsg } from "../redux/actions/uiActions/uiActions";
 
 const signup = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const Uistate = useSelector((state) => state.ui);
+  const UiState: UiInitialState = useSelector((state: GlobalState) => state.ui);
+
+  const [errors, setErrors] = useState<any>("");
+  const [count, setCount] = useState<number>(5);
 
   const [user, setUser] = useState<UserInterface>({
     user: "",
     email: "",
-    confirmPassword: "",
     password: "",
+    confirmPassword: "",
   });
 
+  useEffect(() => {
+    return () => {
+      dispatch(setCongratzMsg());
+    };
+  }, []);
+
   const handleInput = (e: any) => {
-    if (Uistate.errors?.wrongCredentials) {
-      dispatch(clearAllErrors());
+    if (errors) {
+      setErrors("");
     }
 
     setUser({
@@ -49,7 +61,7 @@ const signup = () => {
   return (
     <div className={form}>
       <Auth url={router.pathname} />
-      {Uistate.loading && (
+      {UiState.signLoading && (
         <CircularProgress
           color="secondary"
           size={100}
@@ -117,21 +129,22 @@ const signup = () => {
         >
           Registrarse
         </Button>
-        {Uistate.flag && (
+        {UiState.congratzMsg && (
+          <Alert variant="filled" severity="success">
+            User Register - Redirecting to Login in {count}
+          </Alert>
+        )}
+        {errors !== "" && (
           <Alert
             variant="filled"
-            severity="success"
+            severity="error"
             className="my-2 is-click"
             onClick={() => console.log("removing flag")}
           >
-            Usuario creado con exito
+            {errors}
           </Alert>
         )}
-        {Uistate.errors?.wrongCredentials &&
-          !Uistate.errors?.email &&
-          !Uistate.errors?.password && (
-            <Alert severity="error">{Uistate.errors?.msg}</Alert>
-          )}
+
         <Typography variant="body2" className="my-2">
           Si ya tiene una cuenta{" "}
           <LinkComp url="/signIn" linkClass="has-text-info">

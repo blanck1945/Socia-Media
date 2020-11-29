@@ -1,11 +1,6 @@
-import LinkComp from "../LinkComp/LinkComp";
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { uploadImage } from "../../redux/actions/userActions/userAxios";
-import dayjs from "dayjs";
-
 //MUI imports
 import Paper from "@material-ui/core/Paper";
+import Grid from "@material-ui/core/Grid";
 import MuiLink from "@material-ui/core/Link";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
@@ -16,31 +11,55 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import LocationOn from "@material-ui/icons/LocationOn";
 import LinkIcon from "@material-ui/icons/Link";
 import CalendarToday from "@material-ui/icons/CalendarToday";
+import PhotoIcon from "@material-ui/icons/Photo";
 import EditIcon from "@material-ui/icons/Edit";
 import EditDetails from "../EditDetails/EditDetails";
 
+import LinkComp from "../LinkComp/LinkComp";
+import React, { useState } from "react";
+import FriendListDialog from "./FriendListDialog/FriendListDialog";
+import { useSelector, useDispatch } from "react-redux";
+import { AxiosUploadImg } from "../../redux/actions/userActions/userAxios";
+import dayjs from "dayjs";
+import { UiInitialState } from "../../redux/reducers/uiReducers";
+import { GlobalState } from "../../redux/store";
+import { UserInitialState } from "../../redux/reducers/userReducer";
+
 const Profile = () => {
   const dispatch = useDispatch();
+  const UiState: UiInitialState = useSelector((state: GlobalState) => state.ui);
 
+  //state Variables
+
+  const [openFriendList, setOpenFriendList] = useState<boolean>(false);
+  const [line, setLine] = useState<boolean>(false);
+
+  //Close FriendList
+
+  const toogleList = () => {
+    setOpenFriendList(!openFriendList);
+  };
+
+  const UserState: UserInitialState = useSelector(
+    (state: GlobalState) => state.user
+  );
+  console.log(UserState.credentials);
   const {
-    loading,
-    authenticateUser,
-    credentials: {
-      user,
-      createdAt,
-      defaultImg,
-      imageUrl,
-      bio,
-      website,
-      location,
-      mongoImgString,
-    },
-  } = useSelector((state) => state.user);
+    name,
+    createdAt,
+    defaultImg,
+    bio,
+    website,
+    location,
+    mongoImgString,
+  } = UserState.credentials;
+
+  const { authenticateUser } = useSelector((state) => state.user);
 
   const selectAndUploadImage = async (e: any) => {
     const formData = new FormData();
     formData.append("avatar", e.target.files[0]);
-    dispatch(uploadImage(formData));
+    dispatch(AxiosUploadImg(formData));
   };
 
   const clickBtn = () => {
@@ -48,19 +67,65 @@ const Profile = () => {
     fileInput.click();
   };
 
-  const mark = `@${user}`;
   const joinDay = dayjs(createdAt).format("MMM YYYY");
 
-  let profileMark = !loading ? (
+  let profileMark = !UiState.globalLoading ? (
     authenticateUser ? (
-      <Paper className="">
+      <Paper className="mx-4">
+        <Grid className="has-back-blue is-flex -is-align-center is-justify-between px-2">
+          <p
+            onClick={() => setLine(!line)}
+            className="has-back-blue has-text-white text-center f-size-1-2 is-bold py-1"
+          >
+            @{name}
+          </p>
+          <PhotoIcon
+            className="has-text-white is-click mt-1"
+            onClick={() => clickBtn()}
+          />
+          <input
+            type="file"
+            hidden
+            id="image"
+            onChange={selectAndUploadImage}
+          />
+        </Grid>
         <div className="is-flex is-align-center  is-dis-col">
           <div className="is-flex is-align-center ">
             <img
-              src={mongoImgString ? mongoImgString : defaultImg}
+              src={defaultImg === "none" ? mongoImgString : defaultImg}
               alt="userImage"
               className="mb-2 is-w-full "
             />
+          </div>
+
+          {bio && (
+            <Grid sm={12} className="mb-2 is-w-80 text-center">
+              {bio}
+            </Grid>
+          )}
+          <Grid className="is-flex is-w-50 is-dis-col is-align-start  my-2">
+            {location && (
+              <Grid sm={12} className="my-4 is-flex is-align-center">
+                <LocationOn color="primary" className="ml-4" />
+                <span className="ml-4 ">{location}</span>
+              </Grid>
+            )}
+            {website && (
+              <Grid sm={12} style={{ overflow: "hidden" }} className=" my-2 ">
+                <LinkIcon color="primary" className="ml-4 mt-0-5" />
+                <a className="ml-4" href={website} target="_blank">
+                  {website}
+                </a>
+              </Grid>
+            )}
+            <Grid sm={12} xs={12} className="is-flex is-align-center">
+              <CalendarToday color="primary" className="ml-4" />
+              <span className="ml-4">Joined {joinDay}</span>
+            </Grid>
+          </Grid>
+          <Grid sm={12} className="is-flex is-align-center is-justify-evenly">
+            <EditDetails />
             <input
               hidden={true}
               type="file"
@@ -69,50 +134,24 @@ const Profile = () => {
             />
             <Tooltip title="Edit profile picture" placement="top">
               <IconButton onClick={clickBtn} className="fix-btn is-abs z-5">
-                <EditIcon color="primary" />
+                <PhotoIcon className="has-text-blue" />
               </IconButton>
             </Tooltip>
-          </div>
-          <div>
-            <MuiLink
-              component={LinkComp}
-              color="primary"
-              variant="h5"
-              linkClass="f-size-1-2"
-              url={`/users/${user}`}
-            >
-              {mark}
-            </MuiLink>
-          </div>
-          {bio && <span className="mb-2 is-w-80 text-center">{bio}</span>}
-          {location && (
-            <div className="is-flex  is-w-75 my-2 ">
-              <LocationOn color="primary" className="ml-4" />
-              <span className="ml-4 mt-1">{location}</span>
-            </div>
-          )}
-          {website && (
-            <div
-              style={{ overflow: "hidden" }}
-              className="is-flex is-w-75 my-2 "
-            >
-              <LinkIcon color="primary" className="ml-4 mt-0-5" />
-              <a className="ml-4" href={website} target="_blank">
-                {website}
-              </a>
-            </div>
-          )}
-          <div className="is-flex  is-w-75 is-align-center is-justify-between my-2">
-            <div className="is-flex is-align-center">
-              <CalendarToday color="primary" className="ml-4" />
-              <span className="ml-4">Joined {joinDay}</span>
-            </div>
-            <EditDetails />
-          </div>
+          </Grid>
         </div>
+        <Grid
+          onClick={() => toogleList()}
+          className="is-w-full is-h-35 is-flex is-click is-align-center is-justify-center has-back-blue"
+        >
+          <p className="has-text-white f-size-1-1 ">FriendList</p>
+        </Grid>
+        <FriendListDialog
+          openFriendList={openFriendList}
+          closeFriendList={toogleList}
+        />
       </Paper>
     ) : (
-      <Paper>
+      <Paper className="mr-2">
         <Typography variant="body2" align="center" className="pt-2 ">
           ¿No Profile? - Dont stay outside from the wave
         </Typography>

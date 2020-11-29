@@ -2,14 +2,15 @@ import { UIActionTypes } from "../actions/uiActions/uiInterface";
 import * as UiTypes from "../types";
 
 export interface UiInitialState {
-  loading: boolean;
+  globalLoading: boolean;
+  signLoading: boolean;
   loadingModal: boolean;
-  errors: any;
   openModal: boolean;
+  homeView: boolean;
+  congratzMsg: boolean;
 }
 
 interface FormControl {
-  errors?: string;
   email?: string;
   password?: string;
   loading?: boolean;
@@ -18,30 +19,35 @@ interface FormControl {
 }
 
 const uiInitialState: UiInitialState = {
-  loading: false,
+  globalLoading: true,
+  signLoading: false,
   loadingModal: false,
-  errors: undefined,
   openModal: false,
+  homeView: false,
+  congratzMsg: false,
 };
 
 const UiReducer = (state = uiInitialState, action: UIActionTypes | any) => {
   switch (action.type) {
-    case UiTypes.SET_LOADING:
+    case UiTypes.SET_GLOBAL_LOADING:
       return {
         ...state,
-        loading: !state.loading,
+        globalLoading: !state.globalLoading,
       };
-    case UiTypes.SET_ERRORS:
+    case UiTypes.SET_GLOBAL_LOADING_ON:
       return {
         ...state,
-        loading: false,
-        errors: action.payload,
+        globalLoading: true,
       };
-    case UiTypes.CLEAR_ERRORS:
+    case UiTypes.SET_GLOBAL_LOADING_OFF:
       return {
         ...state,
-        loading: false,
-        errors: undefined,
+        globalLoading: false,
+      };
+    case UiTypes.SET_SIGN_LOADING:
+      return {
+        ...state,
+        signLoading: !state.signLoading,
       };
     case UiTypes.TOOGLE_MODAL:
       return {
@@ -53,6 +59,21 @@ const UiReducer = (state = uiInitialState, action: UIActionTypes | any) => {
       return {
         ...state,
         loadingModal: !state.loadingModal,
+      };
+    case UiTypes.SET_HOME_VIEW:
+      return {
+        ...state,
+        homeView: true,
+      };
+    case UiTypes.CLEAR_HOME_VIEW:
+      return {
+        ...state,
+        homeView: false,
+      };
+    case UiTypes.SET_CONGRATZ_MSG:
+      return {
+        ...state,
+        congratzMsg: !state.congratzMsg,
       };
     default:
       return state;

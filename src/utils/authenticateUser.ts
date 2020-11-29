@@ -43,17 +43,15 @@ const getAuthenticateUser = async (token) => {
   return logUser;
 };
 
-export const authenticateUser = async (res, user?) => {
+export const authenticateUser = async (res) => {
   const firebase = firebaseClient();
   const auth = firebase.auth();
 
   const errorMsg = "autenticación de usuario falló";
-  if (!user) {
-    user = {
-      email: "vane990@gmail.com",
-      password: "123456",
-    };
-  }
+  const user = {
+    email: "gasquet990@gmail.com",
+    password: "123456",
+  };
 
   try {
     const authenticateUser = await auth.signInWithEmailAndPassword(

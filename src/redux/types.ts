@@ -2,20 +2,33 @@
 export const SET_USER_DATA = "SET_USER_DATA";
 export const UNAUTHENTICATED = "UNAUTHENTICATED";
 export const LOADING_USER = "LOADING_USER";
+export const SET_USER_AUTH_ON = "SET_USER_AUTH_ON";
+export const SET_USER_TO_INITIAL = "SET_USER_TO_INITIAL"
+//Navigation types
+export const SET_NAV_USER = "SET_NAVIGATION_USER";
+export const SET_NAV_SAY = "SET_NAVIGATION_SAY";
 //UI Actions
-export const SET_ERRORS = "SET_ERRORS";
-export const CLEAR_ERRORS = "CLEAR_ERRORS";
-export const SET_LOADING = "SET_LOADING";
-export const SET_LOADING_DATA = "SET_LOADING_DATA";
+export const SET_GLOBAL_LOADING = "SET_GOBAL_LOADING";
+export const SET_SIGN_LOADING = "SET_SIGN_LOADING";
+export const SET_CONGRATZ_MSG = "SET_CONGRATZ_MSG";
 export const SET_LOADING_MODAL = "SET_LOADING_MODAL";
+export const SET_LOADING_DATA = "SET_LOADING_DATA";
 export const TOOGLE_MODAL = "TOOGLE_MODAL";
+export const SET_HOME_VIEW = "SET_HOME_VIEW";
+export const CLEAR_HOME_VIEW = "CLEAR_HOME_VIEW";
+export const SET_GLOBAL_LOADING_OFF = "SET_GLOBAL_LOADING_OFF";
+export const SET_GLOBAL_LOADING_ON = "SET_GLOBAL_LOADING_ON";
 //Data Actions
 export const POST_SAY = "POST_SAY";
 export const DELETE_SAY = "DELETE_SAY";
 export const SET_SAYINGS = "SET_SAYINGS";
+export const SET_OWN_SAYINGS = "SET_OWN_SAYINGS";
 export const SET_ONE_SAY = "SET_ONE_SAY";
+export const SET_SEARCH_RESULT = "SET_SEARCH_RESULT";
 export const LIKE_SAY = "LIKE_SAY";
 export const UNLIKE_SAY = "UNLIKE_SAY";
 export const COMMENT_SAT = "COMMENT_SAY";
 export const SET_COMMENTS = "SET_COMMENTS";
+export const ADD_NEW_COMMENT = "ADD_NEW_COMMENT";
 export const CLEAR_COMMENTS = "CLEAR_COMMENTS";
+export const SET_DATA_TO_INITIAL = "SET_DATA_TO_INITIAL"

@@ -11,10 +11,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { GlobalState } from "../../redux/store";
-import {
-  setErrors,
-  toogleModal,
-} from "../../redux/actions/uiActions/uiActions";
+import { toogleModal } from "../../redux/actions/uiActions/uiActions";
 import { validateField } from "./validateField";
 import { axiosPostSay } from "../../redux/actions/dataActions/dataAxios";
 import { UiInitialState } from "../../redux/reducers/uiReducers";
@@ -28,13 +25,19 @@ const PostSay = () => {
   const dispatch = useDispatch();
 
   const [body, setBody] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<any>({
     msg: "",
     state: false,
   });
   const [length, setlength] = useState<number>(DataSate.sayLength);
   const handleInput = (value: string) => {
-    console.log("handleling imput");
+    if (error.state) {
+      setError({
+        msg: "",
+        state: false,
+      });
+    }
     setBody(value);
     const num = 149 - value.length;
     setlength(num);
@@ -73,8 +76,11 @@ const PostSay = () => {
       <div className="modal-content has-background-white has-rad-4 is-w-45 is-h-275 is-flex is-dis-col is-align-center">
         {UiState.loadingModal ? (
           <div className="is-flex is-align-center is-dis-col is-justify-center is-h-full is-w-full">
-            <img src="/icons8-son-goku-64.png" alt="appIcon" className="mb-4" />
-            <CircularProgress />
+            <img
+              src="/images/icons8-son-goku-64.png"
+              alt="appIcon"
+              className="mb-4"
+            />
           </div>
         ) : (
           <>

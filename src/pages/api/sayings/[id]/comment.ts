@@ -28,17 +28,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     case "POST":
       const user = await firebaseAuthUser(req, res);
-      if (req.body.body.trim() === "") {
-        return res.status(404).json({ comment: "no puede estar vacio" });
-      }
+      console.log(req.body);
 
       const newComment = {
-        body: req.body.body,
+        body: req.body.comment,
         user: user.user,
         sayingId: req.query.id,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
         imageUrl: user.imageUrl,
       };
+
+      console.log(newComment);
 
       try {
         const doc = await db.doc(`/sayings/${req.query.id}`).get();

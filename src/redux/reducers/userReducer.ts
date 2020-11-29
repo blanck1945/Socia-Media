@@ -39,6 +39,11 @@ const UserReducer = (
         likes: action.payload.likes,
         loading: false,
       };
+    case UserTypes.SET_USER_AUTH_ON:
+      return {
+        ...state,
+        authenticateUser: true,
+      };
     case UserTypes.LOADING_USER:
       return {
         ...state,
@@ -62,7 +67,8 @@ const UserReducer = (
           (like) => like?.sayId !== action.payload.sayingId
         ),
       };
-
+    case UserTypes.SET_USER_TO_INITIAL:
+      return userInitialState;
     default:
       return state;
   }

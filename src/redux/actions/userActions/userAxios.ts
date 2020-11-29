@@ -3,7 +3,11 @@ import { Dispatch } from "react";
 import { axiosFetcher, axiosSender } from "../../../api/fetcher";
 import { setLoadingData } from "../dataActions/dataActions";
 import { axiosGetSayings } from "../dataActions/dataAxios";
-import { clearAllErrors, setErrors, setLoading } from "../uiActions/uiActions";
+import {
+  setCongratzMsg,
+  setGlobalLoading,
+  setSignLoading,
+} from "../uiActions/uiActions";
 import { setLoadingUser, setUnauthenticated, setUserData } from "./userActions";
 
 export interface UserInterface {
@@ -13,115 +17,66 @@ export interface UserInterface {
   confirmPassword?: string;
 }
 
+interface CredentialsResponse {
+  msg: string;
+  state: boolean;
+  userData: any;
+}
+
+export const AxiosCheckCredentials = () => async (dispatch: Dispatch<any>) => {
+  try {
+    const data: CredentialsResponse = await axiosFetcher("user/credentials");
+    dispatch(setUserData(data.userData));
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
 export const AxiosSignUpUser = (user: UserInterface, router) => async (
   dispatch
 ) => {
-  dispatch(setLoading());
-  console.log("loading state change");
+  dispatch(setGlobalLoading());
 
   try {
-    const data = await axiosSender(user, "auth/signup");
-    setAuthHeader(data.token);
-    await dispatch(getUserData());
-    dispatch(clearAllErrors());
-
-    router.push("/");
+    await axiosSender(user, "auth/signup");
+    dispatch(setCongratzMsg());
+    //await dispatch(getUserData());
+    setTimeout(() => {
+      router.push("/signIn");
+    }, 5000);
   } catch (err) {
-    err.response.data.errors
-      ? dispatch(
-          setErrors({
-            msg: err.response.data.msg,
-            email:
-              err.response.data.errors.length === 1 &&
-              err.response.data.errors[0].email
-                ? "Email " + err.response.data?.errors[0]?.email
-                : err.response.data.errors.length > 1
-                ? "Email " + err.response.data?.errors[0]?.email
-                : null,
-            password:
-              err.response.data.errors.length === 1 &&
-              err.response.data.errors[0].password
-                ? "Password " + err.response.data?.errors[0].password
-                : err.response.data.errors.length > 1
-                ? "Password " + err.response.data?.errors[1].password
-                : null,
-          })
-        )
-      : dispatch(
-          setErrors({
-            msg: err.response.data.msg,
-            email:
-              err.response.data.email !== undefined
-                ? err.response.data.email
-                : null,
-            password:
-              err.response.data.password !== undefined
-                ? err.response.data.password
-                : null,
-            wrongCredentials: true,
-          })
-        );
+    console.log(err);
   }
 };
 
 export const AxiosLoginUser = (user: UserInterface, router) => async (
   dispatch
 ) => {
-  dispatch(setLoading());
+  dispatch(setSignLoading());
 
   try {
     const data = await axiosSender(user, "auth/signin");
-
-    setAuthHeader(data.token);
-    await dispatch(getUserData());
-    dispatch(clearAllErrors());
-
+    dispatch(setUserData(data.userData));
+    dispatch(AxiosCheckCredentials());
     router.push("/");
   } catch (err) {
-    err.response.errors
-      ? dispatch(
-          setErrors({
-            msg: err.response.msg,
-            email:
-              err.response.data.errors.length === 1 &&
-              err.response.data.errors[0].email
-                ? "Email " + err.response.data?.errors[0]?.email
-                : err.response.data.errors.length > 1
-                ? "Email " + err.response.data?.errors[0]?.email
-                : null,
-            password:
-              err.response.data.errors.length === 1 &&
-              err.response.data.errors[0].password
-                ? "Password " + err.response.data?.errors[0].password
-                : err.response.data.errors.length > 1
-                ? "Password " + err.response.data?.errors[1].password
-                : null,
-          })
-        )
-      : dispatch(
-          setErrors({
-            msg: err.response.msg,
-            email:
-              err.response.data.email !== undefined
-                ? err.response.data.email
-                : null,
-            password:
-              err.response.data.password !== undefined
-                ? err.response.data.password
-                : null,
-            wrongCredentials: true,
-          })
-        );
+    console.log(err);
   }
 };
 
-export const uploadImage = (formData: any) => async (dispatch) => {
-  dispatch(setLoadingUser());
+interface AxiosImgResponse {
+  msg: string;
+  mongoUser: any;
+}
+
+export const AxiosUploadImg = (formData: any) => async (dispatch) => {
+  dispatch(setGlobalLoading());
   try {
-    const data = await axiosSender(formData, "user/image");
-    console.log(data);
+    const data: AxiosImgResponse = await axiosSender(formData, "user/image");
+    console.log(data)
     dispatch(axiosGetSayings());
-    dispatch(getUserData());
+    dispatch(AxiosCheckCredentials());
   } catch (err) {
     dispatch(setLoadingData());
   }
@@ -136,27 +91,30 @@ export const axiosLogOut = (router) => (dispatch: Dispatch<any>) => {
 export const axiosEditUserDetails = (userDetails: any) => async (
   dispatch: Dispatch<any>
 ) => {
-  dispatch(setLoadingUser());
   try {
     await axiosSender(userDetails, "user/update-user");
-    dispatch(getUserData());
+    dispatch(AxiosCheckCredentials());
   } catch (err) {
     console.log(err);
   }
 };
 
-export const setAuthHeader = (token) => {
-  const FBIdToken = `Bearer ${token}`;
-  localStorage.setItem("FBIdToken", FBIdToken);
-  Axios.defaults.headers.common["Authorization"] = FBIdToken;
-};
+// export const setAuthHeader = (token) => {
+//   if (token.startsWith("Bearer ")) {
+//     Axios.defaults.headers.common["Authorization"] = token;
+//   } else {
+//     const completeToken = "Bearer " + token;
+//     Axios.defaults.headers.common["Authorization"] = completeToken;
+//   }
+// };
 
-export const getUserData = (token?) => async (dispatch: Dispatch<any>) => {
-  dispatch(setLoadingUser());
-  if (!Axios.defaults.headers.common["Authorization"]) {
-    setAuthHeader(token.split("Bearer ")[1]);
+export const getUserData = () => async (dispatch: Dispatch<any>) => {
+  //dispatch(setGlobalLoading());
+
+  try {
+    const user = await axiosFetcher("user/credentials");
+    dispatch(setUserData(user.data));
+  } catch (err) {
+    console.log(err);
   }
-  const user = await axiosFetcher("user/user-credentials");
-  console.log(user)
-  dispatch(setUserData(user.data));
 };

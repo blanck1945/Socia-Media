@@ -16,15 +16,17 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import Alert from "@material-ui/lab/Alert";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { clearAllErrors } from "../redux/actions/uiActions/uiActions";
 import { GlobalState } from "../redux/store";
 import { UiInitialState } from "../redux/reducers/uiReducers";
+import { validateSchema } from "../validators/AuthSchema";
+import { signInSchema } from "../../YupSchemas/YupSchemas";
 
 const signin = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const Uistate: UiInitialState = useSelector((state: GlobalState) => state.ui);
 
+  const [errors, setErrors] = useState<any>("");
   const [user, setUser] = useState<UserInterface>({
     email: "",
     password: "",
@@ -40,8 +42,8 @@ const signin = () => {
   }, []);
 
   const handleInput = (e: any) => {
-    if (Uistate.errors) {
-      dispatch(clearAllErrors());
+    if (errors) {
+      setErrors("");
     }
 
     setUser({
@@ -50,15 +52,17 @@ const signin = () => {
     });
   };
 
-  const handleForm = (e: any) => {
+  const handleForm = async (e: any) => {
     e.preventDefault();
+    const validate = await validateSchema(signInSchema, user);
+
     dispatch(AxiosLoginUser(user, router));
   };
 
   return (
     <div className={form}>
       <Auth url={router.pathname} />
-      {Uistate.loading && (
+      {Uistate.signLoading && (
         <CircularProgress
           color="secondary"
           size={100}
@@ -84,8 +88,6 @@ const signin = () => {
           name="email"
           type="email"
           label="Email"
-          helperText={Uistate.errors?.email}
-          error={Uistate.errors?.email ? true : false}
           className="my-2"
           fullWidth
           value={user.email}
@@ -96,8 +98,6 @@ const signin = () => {
           id="password"
           name="password"
           type="password"
-          helperText={Uistate.errors?.password}
-          error={Uistate.errors?.password ? true : false}
           label="Contraseña"
           className="my-2 mb-4"
           value={user.password}
@@ -107,16 +107,12 @@ const signin = () => {
           type="submit"
           variant="contained"
           color="primary"
-          disabled={Uistate.loading}
+          disabled={Uistate.signLoading}
           className="is-h-35 my-4 "
         >
           Iniciar Sesión
         </Button>
-        {Uistate.errors?.wrongCredentials &&
-          !Uistate.errors?.email &&
-          !Uistate.errors?.password && (
-            <Alert severity="error">{Uistate.errors?.msg}</Alert>
-          )}
+        {errors !== "" && <Alert severity="error">{errors}</Alert>}
         <Typography variant="body2" className="my-2">
           Si no tiene una cuenta{" "}
           <LinkComp url="/signUp" linkClass="has-text-info">

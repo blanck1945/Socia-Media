@@ -1,4 +1,5 @@
 import { isEmail, isEmpty } from "./validators";
+import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
 interface Body {
   user?: string;
@@ -12,41 +13,47 @@ interface Body {
 
 interface Details {}
 
-export const validateRequest = (res: any, body: Body) => {
-  let validations = [];
+// export const AuthenticateUserMiddleware = (
+//   schema: any,
+//   fn: NextApiHandler
+// ) => async (req: NextApiRequest, res: NextApiResponse) => {
+//   let validations = [];
 
-  for (const [key, value] of Object.entries(body)) {
-    validations.push({
-      [key]: isEmpty(value) === undefined ? "" : isEmpty(value),
-    });
-  }
+//   for (const [key, value] of Object.entries(req.body)) {
+//     validations.push({
+//       [key]: isEmpty(value) === undefined ? "" : isEmpty(value),
+//     });
+//   }
 
-  if (body.website) {
-    body.website.trim().substring(0, 4) !== "http"
-      ? (body.website = `http://${body.website.trim()}`)
-      : body.website;
-  }
+//   if (req.body.website) {
+//     req.body.website.trim().substring(0, 4) !== "http"
+//       ? (req.body.website = `http://${body.website.trim()}`)
+//       : req.body.website;
+//   }
 
-  const requireError = checkErrors(validations);
-  if (requireError) {
-    return formatResponse(res, requireError);
-  }
+//   const requireError = checkErrors(validations);
+//   if (requireError) {
+//     return formatResponse(res, requireError);
+//   }
 
-  if (body.email) {
-    const emailError = checkEmail(body.email);
-    if (emailError) {
-      return formatResponse(res, emailError);
-    }
-  }
-  if (body.confirmPassword) {
-    const checkPass = checkEqualPassword(body.password, body.confirmPassword);
-    if (checkPass) {
-      return formatResponse(res, checkPass);
-    }
-  }
+//   if (req.body.email) {
+//     const emailError = checkEmail(req.body.email);
+//     if (emailError) {
+//       return formatResponse(res, emailError);
+//     }
+//   }
+//   if (req.body.confirmPassword) {
+//     const checkPass = checkEqualPassword(
+//       req.body.password,
+//       req.body.confirmPassword
+//     );
+//     if (checkPass) {
+//       return formatResponse(res, checkPass);
+//     }
+//   }
 
-  return true;
-};
+//   return true;
+// };
 
 const formatResponse = (res, error: any) => {
   res.status(400).json({

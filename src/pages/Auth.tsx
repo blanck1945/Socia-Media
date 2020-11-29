@@ -44,7 +44,7 @@ const Auth = ({ url }: AuthProps) => {
         setDis(true);
       } else {
         if (!UserState.authenticateUser) {
-          await dispatch(getUserData(token));
+          await dispatch(getUserData());
           setDis(true);
         }
         setDis(true);

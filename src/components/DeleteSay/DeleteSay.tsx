@@ -30,11 +30,13 @@ const DeleteSay = ({ sayId }: DeleteSayProps) => {
     handleOpenDialog();
   };
 
-  console.log("iterando en compoenten");
-
   return (
     <>
-      <CustomBtn tip="Delete Say" func={handleOpenDialog} toolClass="ml-4 mb-2">
+      <CustomBtn
+        tip="Delete Say"
+        func={handleOpenDialog}
+        toolClass="px-1 py-1 my-2 mr-2 has-round-half has-background-white"
+      >
         <DeleteOutline color="secondary" />
       </CustomBtn>
       <Dialog

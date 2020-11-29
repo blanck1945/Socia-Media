@@ -11,9 +11,11 @@ interface CommentInterface {
 }
 
 export interface DataInitialState {
-  sayings: [SayInterface];
+  sayings: SayInterface[];
   singleSay: SayInterface;
+  searchResult: any;
   comments: CommentInterface[];
+  OwnSayings: SayInterface[];
   loading: boolean;
   sayLength: number;
 }
@@ -22,6 +24,8 @@ const dataInitialState = {
   sayings: undefined,
   singleSay: undefined,
   comments: undefined,
+  OwnSayings: undefined,
+  searchResult: undefined,
   loading: false,
   sayLength: 149,
 };
@@ -35,6 +39,11 @@ const DataReducer = (
       return {
         ...state,
         loading: true,
+      };
+    case DataTypes.SET_OWN_SAYINGS:
+      return {
+        ...state,
+        OwnSayings: action.payload,
       };
     case DataTypes.SET_SAYINGS:
       return {
@@ -51,7 +60,7 @@ const DataReducer = (
     case DataTypes.LIKE_SAY:
     case DataTypes.UNLIKE_SAY:
       let index = state.sayings.findIndex(
-        (say) => say.sayingId === action.payload.sayingId
+        (say) => say._id === action.payload._id
       );
       state.sayings[index] = action.payload;
       return {
@@ -70,7 +79,7 @@ const DataReducer = (
       return {
         ...state,
         loading: false,
-        sayings: [action.payload, ...state.sayings],
+        OwnSayings: [action.payload, ...state.OwnSayings],
       };
     case DataTypes.TOOGLE_MODAL:
       return {
@@ -87,6 +96,18 @@ const DataReducer = (
         ...state,
         comments: undefined,
       };
+    case DataTypes.SET_SEARCH_RESULT:
+      return {
+        ...state,
+        searchResult: action.payload,
+      };
+    case DataTypes.ADD_NEW_COMMENT:
+      return {
+        ...state,
+        comments: [...state.comments, action.payload],
+      };
+    case DataTypes.SET_DATA_TO_INITIAL:
+      return dataInitialState;
     default:
       return state;
   }

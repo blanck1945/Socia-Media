@@ -16,7 +16,6 @@ interface MongoUser {
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const user = await firebaseAuthUser(req, res);
-  console.log("user decoded");
   await dbConnect();
   const firebase = await firebaseClient();
   const db = firebase.firestore();
@@ -38,41 +37,37 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const mongoUser: any = await Models.Usuario.findOne({
           name: user.user,
         });
-        //const mongob64 = Buffer.from(mongoUser.avatar, "base64");
-        //const mongoImgString = `data:${mongoUser.type};base64,${mongob64}`;
-        mongoUser.mongoImgString;
+        if (mongoUser.avatar) {
+          const mongob64 = Buffer.from(mongoUser.avatar, "base64");
+          const mongoImgString = `data:${mongoUser.type};base64,${mongob64}`;
+          mongoUser.mongoImgString = mongoImgString;
+        }
 
-        const doc: any = await db.doc(`/users/${user.user}`).get();
-        if (doc.exists) {
-          userData.credentials = {
-            ...doc.data(),
-            ...mongoUser.toJSON(),
-          };
-          if (!userData.credentials.imageUrl) {
-            userData.credentials.imageUrl =
-              "./public/uploads/images/no-user-photo-png";
-          }
+        userData.credentials = {
+          ...mongoUser.toJSON(),
+        };
 
-          const likesDoc = await db
-            .collection("likes")
-            .where("user", "==", user.user)
-            .get();
+        const likesDoc = await db
+          .collection("likes")
+          .where("user", "==", user.user)
+          .get();
 
+        if (likesDoc) {
           likesDoc.forEach((doc) => {
             userData.likes.push(doc.data());
           });
-
-          //agregar notificaciones aca
-
-          return res.status(200).json({
-            msg: "información de usuario obtenida con exito",
-            data: userData,
-          });
         }
+
+        //agregar notificaciones aca
+
+        return res.status(200).json({
+          msg: "información de usuario obtenida con exito",
+          data: userData,
+        });
       } catch (err) {
         return res.status(404).json({
           msg: "Algo falló al intentar obtener la información",
-          error: err.code,
+          error: err,
         });
       }
 

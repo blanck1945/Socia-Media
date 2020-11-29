@@ -1,6 +1,4 @@
 import env from "dotenv";
-import "firebase/storage";
-import mongo from "mongodb";
 import dbConnect from "../../../../mongo/mongo.db";
 import { NextApiRequest, NextApiResponse } from "next";
 import { firebaseAuthUser } from "../../../utils/authenticateUser";
@@ -31,18 +29,22 @@ env.config();
 
 import formidable from "formidable";
 import Models from "../../../models/Models";
+import {
+  AuthenticateUserMiddleware,
+  SayApiRequest,
+} from "../../../utils/AuthenticateMiddleware";
 
-export default async (req, res) => {
-  const user = await firebaseAuthUser(req, res);
-  await dbConnect();
+export default AuthenticateUserMiddleware(
+  async (req: SayApiRequest, res: NextApiResponse) => {
+    await dbConnect();
 
-  const { method } = req;
+    const { method } = req;
 
-  switch (method) {
-    case "POST":
+    if (method === "POST") {
       const mongoUser = await Models.Usuario.findOne({
-        name: user.user,
+        name: req.user.name,
       });
+      console.log(mongoUser);
 
       const data: any = await new Promise((resolve, reject) => {
         const form = new formidable.IncomingForm({
@@ -60,42 +62,19 @@ export default async (req, res) => {
 
       mongoUser.avatar = image.toString("base64");
       mongoUser.type = data.files.avatar.type;
-      try {
-        await mongoUser.save();
-        return res.status(200).json({
-          data: mongoUser,
-          msg: "Data send",
-        });
-      } catch (err) {
-        return res.status(404).json({
-          msg: "error",
-          err: err,
-        });
-      }
-
-      /*const img = data.files.image;
-      console.log(Buffer.from(data.files.image.path, "base64"));
-
-      mongoUser.avatar = Buffer.from(data.files.image.path, "base64");
-      mongoUser.type = img.type;
-      console.log("mongoUser update");*/
-      /*var file = fs.readFileSync(data.files.image.path);
-      var insert_data: any = {};
-      insert_data.file_data = Binary(file);*/
-
-      //onsole.log(data.files.image);
-      //const encImg = data.files.image.path.toString("base64");
-
-      break;
-    default:
-      return res.status(500).json({
-        msg: "error de servidor",
+      mongoUser.defaultImg = "none";
+      await mongoUser.save();
+      return res.status(200).json({
+        mongoUser,
+        msg: "Data send",
       });
-
-    /*return promise.then(({ fields, files }) => {
-      });*/
+    } else {
+      return res.status(404).json({
+        msg: "Only POST request",
+      });
+    }
   }
-};
+);
 
 /*  form.once("error", console.error);
         form.on("fileBegin", (name, file) => {

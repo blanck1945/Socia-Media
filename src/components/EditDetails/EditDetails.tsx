@@ -38,6 +38,12 @@ const EditDetails = () => {
     });
   };
 
+  const handleClose = () => {
+    setUserDetails({
+      openDetails: false,
+    });
+  };
+
   const handleSubmit = async () => {
     await dispatch(axiosEditUserDetails(userDetails));
     handleOpen();
@@ -54,12 +60,12 @@ const EditDetails = () => {
     <>
       <Tooltip title="Edit details" placement="top">
         <IconButton onClick={() => handleOpen()} className="pb-4">
-          <EditIcon color="primary" />
+          <EditIcon className="has-text-blue" />
         </IconButton>
       </Tooltip>
       <Dialog
         open={userDetails.openDetails}
-        onClose={userDetails.openDetails}
+        onClose={handleClose}
         fullWidth
         maxWidth="sm"
       >

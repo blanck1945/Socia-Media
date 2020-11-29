@@ -1,3 +1,4 @@
+import User from "../../../models/User";
 import * as UserTypes from "../../types";
 
 export interface FBUser {
@@ -22,10 +23,18 @@ export const setUserData = (payload: FBUserRespose) => ({
   payload: payload,
 });
 
+export const setUserAuthOn = () => ({
+  type: UserTypes.SET_USER_AUTH_ON,
+});
+
 export const setUnauthenticated = () => ({
   type: UserTypes.UNAUTHENTICATED,
 });
 
 export const setLoadingUser = () => ({
   type: UserTypes.LOADING_USER,
+});
+
+export const setUserStateToInitial = () => ({
+  type: UserTypes.SET_USER_TO_INITIAL,
 });

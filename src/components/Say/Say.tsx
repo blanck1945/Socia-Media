@@ -1,6 +1,7 @@
 //Mui Imports
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
+import Grid from "@material-ui/core/Grid";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 
@@ -28,9 +29,9 @@ import {
 } from "../../redux/actions/dataActions/dataAxios";
 import { GlobalState } from "../../redux/store";
 import { UserInitialState } from "../../redux/reducers/userReducer";
-import { UiInitialState } from "../../redux/reducers/uiReducers";
 import { useState } from "react";
 import { DataInitialState } from "../../redux/reducers/dataReducers";
+import SayDialog from "../SayDialog/SayDialog";
 
 interface SayProps {
   say: SayInterface;
@@ -51,25 +52,22 @@ const Say = ({ say }: SayProps) => {
   const userLikeSayings = () => {
     if (
       UserState.likes &&
-      UserState.likes.find((like) => like.sayId === say.sayingId)
+      UserState.likes.find((like) => like.sayId === say._id)
     ) {
       return true;
     } else {
       return false;
     }
   };
-
   const likeSay = () => {
-    dispatch(axiosLikeSay(say.sayingId));
+    dispatch(axiosLikeSay(say._id));
     userLikeSayings();
   };
 
   const unlikeSay = () => {
-    dispatch(axiosUnLikeSay(say.sayingId));
+    dispatch(axiosUnLikeSay(say._id));
     userLikeSayings();
   };
-
-  console.log(DataState.comments);
 
   const likeBtn = !UserState.authenticateUser ? (
     <CustomBtn tip="Like">
@@ -88,8 +86,8 @@ const Say = ({ say }: SayProps) => {
   );
 
   const deleteBtn =
-    UserState.authenticateUser && UserState.credentials.user === say.user ? (
-      <DeleteSay sayId={say.sayingId} />
+    UserState.authenticateUser && UserState.credentials.name === say.name ? (
+      <DeleteSay sayId={say._id} />
     ) : null;
 
   const handleOpenAndRequest = () => {
@@ -104,79 +102,12 @@ const Say = ({ say }: SayProps) => {
 
   return (
     <>
-      <div className={openModal ? "is-active modal" : "modal"}>
-        <div className="modal-background"></div>
-        <div className="modal-content is-w-45 has-background-white px-2 py-2 has-rad-4">
-          <Cancel
-            className="has-text-metal has-background-white is-click"
-            onClick={() => handleClose()}
-          />
-          <div className="is-flex is-justify-between">
-            <CardMedia
-              image={
-                say.mongoImgString !== "No user in Mongo DB"
-                  ? say.mongoImgString
-                  : say.userImage
-              }
-              title="profileImg"
-              className="is-w-60 is-h-450 "
-            />
-            <div className="is-flex is-align-center is-dis-col px-4 is-w-40">
-              <Typography
-                variant="h5"
-                component={LinkComp}
-                url={`/users/${say.user}`}
-                linkClass="has-text-info f-size-1-3 mb-1"
-              >
-                {say.user}
-              </Typography>
-              <Typography
-                variant="body1"
-                className="text-center has-background-light has-rad-4 px-2 py-2"
-              >
-                {say.body}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                className="mt-1"
-              >
-                {day(say.createdAt).fromNow()}
-              </Typography>
-              <div className="my-2">
-                {likeBtn}
-                <span className="ml-2 mr-4">{say.likeCount} likes</span>
-              </div>
-              <div className="has-background-light is-w-full">
-                <p className="has-background-link has-text-white  text-center has-rad-4">
-                  Comments
-                </p>
-                {DataState.comments !== undefined ? (
-                  DataState.comments.map((el, index) => (
-                    <div
-                      key={index}
-                      className="has-background-white mx-1  my-2 px-2 pb-1 has-rad-4"
-                    >
-                      <p>{el.body}</p>
-                      <h4 className="is-bold has-text-link">{el.user}</h4>
-                    </div>
-                  ))
-                ) : (
-                  <p>Loading</p>
-                )}
-                <div className="is-flex is-align-center mx-2  py-1">
-                  <input type="text" className="is-w-90 mr-2 is-h-35" />
-                  <SendIcon className="is-click" />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="is-flex is-dis-col">
-            <p>Comments</p>
-          </div>
-        </div>
-        <button className="modal-close is-large" aria-label="close"></button>
-      </div>
+      <SayDialog
+        handleClose={handleClose}
+        likeBtn={likeBtn}
+        openModal={openModal}
+        say={say}
+      />
       <Card className="mb-4 is-flex is-h-175 is-click">
         <CardMedia
           image={
@@ -187,36 +118,43 @@ const Say = ({ say }: SayProps) => {
           title="profileImg"
           className="image is-h-200 is-w-30"
         />
-        <CardContent className="is-w-80">
-          <div className="is-w-full is-h-35 is-flex is-aling-center is-justify-between">
+        <Grid className="is-w-80 is-flex is-dis-col">
+          <Grid className="is-w-full has-back-blue is-h-35 has-background-white is-flex is-align-center pt-1">
+            <h3 className="has-text-blue f-size-1-1 pl-2 has-text-black is-bold">
+              By {say.name}
+            </h3>
             <Typography
-              variant="h5"
-              component={LinkComp}
-              url={`/users/${say.user}`}
-              linkClass="has-text-info f-size-1-3 mb-1"
+              variant="body2"
+              color="textSecondary"
+              className="mr-4  is-bold has-text-blue pl-2 has-bor-1 has-background-white"
             >
-              {say.user}
+              Publish {day(say.createdAt).fromNow()}
             </Typography>
+          </Grid>
+          <Grid className=" is-flex has-back-white mt-1 is-h-75">
+            <h3 className="pl-2 has-text-blue f-size-1-2 is-bold">
+              {say.body}
+            </h3>
+          </Grid>
+          <Grid className="pl-2  is-w-full is-h-50 is-flex is-align-center is-justify-between ">
+            <Grid className=" is-flex is-align-center pl-2">
+              {likeBtn}
+              <span className="ml-2 mr-4 has-text-blue">
+                {say.likeCount} likes
+              </span>
+              <CustomBtn tip="Add a comment">
+                <ChatIcon
+                  color="primary"
+                  onClick={() => handleOpenAndRequest()}
+                />
+              </CustomBtn>
+              <span className="ml-2 mr-4 has-text-blue">
+                {say.commentCount} comments
+              </span>
+            </Grid>
             {deleteBtn}
-          </div>
-          <div className="is-h-50">
-            <Typography variant="body1">{say.body}</Typography>
-            <Typography variant="body2" color="textSecondary">
-              {day(say.createdAt).fromNow()}
-            </Typography>
-          </div>
-          <div className="mt-4">
-            {likeBtn}
-            <span className="ml-2 mr-4">{say.likeCount} likes</span>
-            <CustomBtn tip="Add a comment">
-              <ChatIcon
-                color="primary"
-                onClick={() => handleOpenAndRequest()}
-              />
-            </CustomBtn>
-            <span className="ml-2 mr-4">{say.commentCount} comments</span>
-          </div>
-        </CardContent>
+          </Grid>
+        </Grid>
       </Card>
     </>
   );
