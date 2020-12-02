@@ -56,6 +56,8 @@ const signin = () => {
     e.preventDefault();
     const validate = await validateSchema(signInSchema, user);
 
+    console.log("using this route");
+
     dispatch(AxiosLoginUser(user, router));
   };
 

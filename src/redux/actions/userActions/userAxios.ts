@@ -61,11 +61,10 @@ export const AxiosSignUpUser = (user: UserInterface, router) => async (
 export const AxiosLoginUser = (user: UserInterface, router) => async (
   dispatch
 ) => {
-  dispatch(setSignLoading());
+  //dispatch(setSignLoading());
 
   try {
     const data = await axiosSender(user, "auth/signin");
-    console.log(data);
     dispatch(setUserData(data.userData));
     //dispatch(AxiosCheckCredentials());
     router.push("/");

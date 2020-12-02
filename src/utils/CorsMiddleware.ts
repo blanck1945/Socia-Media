@@ -18,4 +18,6 @@ export const CorsMiddleware = (fn: NextApiHandler) => async (
   res: NextApiResponse
 ) => {
   await cors(req, res);
+
+  return await fn(req, res);
 };

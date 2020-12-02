@@ -27,7 +27,9 @@ export default function Home() {
   const UiState: UiInitialState = useSelector((state: GlobalState) => state.ui);
 
   useEffect(() => {
-    dispatch(AxiosCheckCredentials());
+    if (!UserState.authenticateUser) {
+      dispatch(AxiosCheckCredentials());
+    }
   }, []);
 
   useEffect(() => {

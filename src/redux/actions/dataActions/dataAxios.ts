@@ -27,7 +27,8 @@ export const AxiosGetOwnSayings = () => async (dispatch) => {
   try {
     const data: OwnSayingsRespose = await axiosFetcher("user/sayings");
     await dispatch(setOwnSayings(data.ownSays));
-    //dispatch(setGlobalLoadingOff());
+
+    dispatch(setGlobalLoadingOff());
   } catch (err) {
     dispatch(setGlobalLoadingOff());
   }
