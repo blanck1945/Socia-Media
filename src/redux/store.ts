@@ -1,4 +1,4 @@
-import { createStore, combineReducers, applyMiddleware, compose } from "redux";
+import { createStore, combineReducers, applyMiddleware } from "redux";
 
 //Middlewares
 import thunk from "redux-thunk";
@@ -39,7 +39,7 @@ const rootReducers = combineReducers({
   nav: NavReducer,
 });
 
-const enhancer = composeEnhancers(applyMiddleware(...middlewares));
+//const enhancer = composeEnhancers(applyMiddleware(...middlewares));
 export const store =
   process.env.NODE_ENV === "development"
     ? createStore(rootReducers, initialState, null)
