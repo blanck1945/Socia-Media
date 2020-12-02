@@ -17,16 +17,16 @@ export interface GlobalState {
   nav: NavInitialState;
 }
 
-declare global {
-  interface Window {
-    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
-  }
-}
+// declare global {
+//   interface Window {
+//     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
+//   }
+// }
 
-const composeEnhancers =
-  typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
-    : compose;
+// const composeEnhancers =
+//   typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+//     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+//     : compose;
 
 const initialState = {};
 
@@ -42,5 +42,5 @@ const rootReducers = combineReducers({
 const enhancer = composeEnhancers(applyMiddleware(...middlewares));
 export const store =
   process.env.NODE_ENV === "development"
-    ? createStore(rootReducers, initialState, enhancer)
+    ? createStore(rootReducers, initialState, null)
     : createStore(rootReducers, initialState, applyMiddleware(thunk));

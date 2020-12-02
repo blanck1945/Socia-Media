@@ -1,14 +1,22 @@
 import Axios from "axios";
 import { Dispatch } from "react";
 import { axiosFetcher, axiosSender } from "../../../api/fetcher";
-import { setLoadingData } from "../dataActions/dataActions";
+import {
+  setDataStateToInitial,
+  setLoadingData,
+} from "../dataActions/dataActions";
 import { axiosGetSayings } from "../dataActions/dataAxios";
 import {
   setCongratzMsg,
   setGlobalLoading,
   setSignLoading,
 } from "../uiActions/uiActions";
-import { setLoadingUser, setUnauthenticated, setUserData } from "./userActions";
+import {
+  setLoadingUser,
+  setUnauthenticated,
+  setUserData,
+  setUserStateToInitial,
+} from "./userActions";
 
 export interface UserInterface {
   email: string;
@@ -74,7 +82,7 @@ export const AxiosUploadImg = (formData: any) => async (dispatch) => {
   dispatch(setGlobalLoading());
   try {
     const data: AxiosImgResponse = await axiosSender(formData, "user/image");
-    console.log(data)
+    console.log(data);
     dispatch(axiosGetSayings());
     dispatch(AxiosCheckCredentials());
   } catch (err) {
@@ -83,8 +91,8 @@ export const AxiosUploadImg = (formData: any) => async (dispatch) => {
 };
 
 export const axiosLogOut = (router) => (dispatch: Dispatch<any>) => {
-  localStorage.removeItem("FBIdToken");
-  delete Axios.defaults.headers.common["Authorization"];
+  dispatch(setDataStateToInitial());
+  dispatch(setUserStateToInitial());
   dispatch(setUnauthenticated());
 };
 
