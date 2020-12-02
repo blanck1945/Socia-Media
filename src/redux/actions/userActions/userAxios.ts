@@ -65,8 +65,9 @@ export const AxiosLoginUser = (user: UserInterface, router) => async (
 
   try {
     const data = await axiosSender(user, "auth/signin");
+    console.log(data);
     dispatch(setUserData(data.userData));
-    dispatch(AxiosCheckCredentials());
+    //dispatch(AxiosCheckCredentials());
     router.push("/");
   } catch (err) {
     console.log(err);
